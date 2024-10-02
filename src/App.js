@@ -1,28 +1,22 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import TurnoForm from './TurnoForm'; // Asegúrate de que la ruta sea correcta
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import TurnoForm from './TurnoPantalla'; // Asegúrate de que la ruta sea correcta
+import Home from './Pantalla'; // Asegúrate de que la ruta sea correcta
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1>Turnero</h1>
-        <TurnoForm />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          <h1>EDEMSA</h1>
+          <Routes>
+            <Route path="/pantalla" element={<Home />} /> {/* Ruta para la página de inicio */}
+            <Route path="/" element={<TurnoForm />} /> {/* Ruta para el formulario */}
+          </Routes>
+        </header>
+      </div>
+    </Router>
   );
 }
 
