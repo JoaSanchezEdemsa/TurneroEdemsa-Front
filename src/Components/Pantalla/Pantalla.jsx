@@ -2,7 +2,6 @@ import React from 'react';
 import './Pantalla.css'; 
 
 const Pantalla = () => {
-  // Aquí puedes definir los turnos que están por llamar
   const turnosPorLlamar = [
     "A1",
     "B2",

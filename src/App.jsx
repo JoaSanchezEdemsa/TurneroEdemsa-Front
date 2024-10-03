@@ -1,8 +1,8 @@
 import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import TurnoForm from './TurnoPantalla'; // Asegúrate de que la ruta sea correcta
-import Home from './Pantalla'; // Asegúrate de que la ruta sea correcta
+import TurnoForm from './Components/TurnoPantalla/TurnoPantalla'; // Asegúrate de que la ruta sea correcta
+import Home from './Components/Pantalla/Pantalla'; // Asegúrate de que la ruta sea correcta
 
 function App() {
   return (
