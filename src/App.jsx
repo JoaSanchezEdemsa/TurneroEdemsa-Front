@@ -2,20 +2,18 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import TurnoForm from './Components/TurnoPantalla/TurnoPantalla'; // Asegúrate de que la ruta sea correcta
-import Home from './Components/Pantalla/Pantalla'; // Asegúrate de que la ruta sea correcta
+import Dashboard from './Components/Dashboard/Dashboard'; // Asegúrate de que la ruta sea correcta
+import CajaEmpleados from './Components/CajaEmpleados/CajaEmpleados';
 
 function App() {
   return (
     <Router>
-      <div className="App">
-        <header className="App-header">
-          <h1>EDEMSA</h1>
+      
           <Routes>
-            <Route path="/pantalla" element={<Home />} /> {/* Ruta para la página de inicio */}
-            <Route path="/" element={<TurnoForm />} /> {/* Ruta para el formulario */}
+            <Route path="/" element={<CajaEmpleados />} /> 
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
-        </header>
-      </div>
+      
     </Router>
   );
 }
