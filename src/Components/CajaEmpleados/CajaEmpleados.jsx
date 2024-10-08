@@ -14,17 +14,8 @@ const CajaEmpleados = () => {
   useEffect(() => {
     const fetchEmpleados = async () => {
       try {
-        const token = '5b08017d0a7f2331e78dc013158087c433e75ff09dd601bbe69f3510391521894c780851310cd87e1332f7a0d71080b5';
-        const response = await axios.get('http://localhost:8080/login', {
-          params: { token },
-        });
-        
-        const empleadosData = response.data.result;
-        setEmpleados([empleadosData]);
-        console.log("Hola")
-        // localStorage.setItem('nick', "hola");
-        const nick = localStorage.getItem('nick');
-        console.log(nick)
+        const response = await axios.get('http://localhost:8080/empleados');
+        setEmpleados(response.data);
       } catch (error) {
         console.error('Error fetching empleados:', error);
       }
@@ -56,9 +47,9 @@ const CajaEmpleados = () => {
             onChange={(e) => setSelectedBox1(e.target.value)}
           >
             <option value="">Selecciona un empleado</option>
-            {empleados.map((empleado, index) => (
-              <option key={index} value={empleado.nombrecompleto}>
-                {empleado.nombrecompleto} 
+            {empleados.map((empleado) => (
+              <option key={empleado.id} value={empleado.nombrecompleto}>
+                {empleado.nombrecompleto}
               </option>
             ))}
           </select>
@@ -69,9 +60,9 @@ const CajaEmpleados = () => {
             onChange={(e) => setSelectedBox2(e.target.value)}
           >
             <option value="">Selecciona un empleado</option>
-            {empleados.map((empleado, index) => (
-              <option key={index} value={empleado.nombrecompleto}>
-                {empleado.nombrecompleto} 
+            {empleados.map((empleado) => (
+              <option key={empleado.id} value={empleado.nombrecompleto}>
+                {empleado.nombrecompleto}
               </option>
             ))}
           </select>
@@ -82,9 +73,9 @@ const CajaEmpleados = () => {
             onChange={(e) => setSelectedBox3(e.target.value)}
           >
             <option value="">Selecciona un empleado</option>
-            {empleados.map((empleado, index) => (
-              <option key={index} value={empleado.nombrecompleto}>
-                {empleado.nombrecompleto} 
+            {empleados.map((empleado) => (
+              <option key={empleado.id} value={empleado.nombrecompleto}>
+                {empleado.nombrecompleto}
               </option>
             ))}
           </select>
@@ -95,9 +86,9 @@ const CajaEmpleados = () => {
             onChange={(e) => setSelectedBox4(e.target.value)}
           >
             <option value="">Selecciona un empleado</option>
-            {empleados.map((empleado, index) => (
-              <option key={index} value={empleado.nombrecompleto}>
-                {empleado.nombrecompleto} 
+            {empleados.map((empleado) => (
+              <option key={empleado.id} value={empleado.nombrecompleto}>
+                {empleado.nombrecompleto}
               </option>
             ))}
           </select>
