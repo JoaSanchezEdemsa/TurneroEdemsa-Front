@@ -7,6 +7,7 @@ const CajaEmpleados = () => {
   const [empleados, setEmpleados] = useState([]);
   const [cajas, setCajas] = useState([]); // Agregar estado para las cajas
   const [selectedBoxes, setSelectedBoxes] = useState(['', '', '', '']); // Para manejar las selecciones de boxes
+  const [codUnicom, setCodUnicom] = useState(null); // Estado para guardar COD_UNICOM
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,18 +20,23 @@ const CajaEmpleados = () => {
       }
     };
 
-    const fetchCajas = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/getboxes');
-        setCajas(response.data.result); // Asignar el array de cajas
-      } catch (error) {
-        console.error('Error fetching cajas:', error);
-      }
-    };
-
     fetchEmpleados();
-    fetchCajas();
   }, []);
+
+  const handleEmpleadoSelect = (empleado) => {
+    // Establecer COD_UNICOM del empleado seleccionado
+    setCodUnicom(empleado.COD_UNICOM);
+    fetchCajas(empleado.COD_UNICOM);
+  };
+
+  const fetchCajas = async (codUnicom) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/cajas/${codUnicom}`);
+      setCajas(response.data.result); // Asignar el array de cajas
+    } catch (error) {
+      console.error('Error fetching cajas:', error);
+    }
+  };
 
   const handleTurnoClick = () => {
     navigate('/dashboard');
@@ -54,6 +60,18 @@ const CajaEmpleados = () => {
         <header className="header">
           <h1>Cajas</h1>
         </header>
+
+        <div className="employee-selection">
+          <h2>Selecciona un Empleado</h2>
+          <select onChange={(e) => handleEmpleadoSelect(JSON.parse(e.target.value))}>
+            <option value="">Selecciona un empleado</option>
+            {empleados.map((empleado) => (
+              <option key={empleado.id} value={JSON.stringify(empleado)}>
+                {empleado.nombrecompleto}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div className="box">
           {cajas.map((caja, index) => (
