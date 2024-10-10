@@ -4,48 +4,48 @@ import './CajaEmpleados.css';
 import { useNavigate } from 'react-router-dom';
 
 const CajaEmpleados = () => {
-  const [empleados, setEmpleados] = useState([]);
-  const [cajas, setCajas] = useState([]); // Agregar estado para las cajas
-  const [selectedBoxes, setSelectedBoxes] = useState(['', '', '', '']); // Para manejar las selecciones de boxes
-  const [codUnicom, setCodUnicom] = useState(null); // Estado para guardar COD_UNICOM
+  const [empleadoLogueado, setEmpleadoLogueado] = useState(null); // Estado para el empleado logueado
+  const [cajas, setCajas] = useState([]); // Estado para almacenar las cajas
+  const [selectedBoxes, setSelectedBoxes] = useState({}); // Para manejar las selecciones de empleados por caja
   const navigate = useNavigate();
 
+  // Obtener el empleado logueado y su COD_UNICOM
   useEffect(() => {
-    const fetchEmpleados = async () => {
+    const fetchEmpleadoLogueado = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/empleados');
-        setEmpleados(response.data);
+        const response = await axios.get('http://localhost:8080/login'); // Suponiendo que este endpoint devuelve el empleado logueado
+        const empleado = response.data;
+        setEmpleadoLogueado(empleado); // Guardar el empleado logueado
+        fetchCajas(empleado.COD_UNICOM); // Obtener cajas usando el COD_UNICOM
       } catch (error) {
-        console.error('Error fetching empleados:', error);
+        console.error('Error fetching empleado logueado:', error);
       }
     };
 
-    fetchEmpleados();
+    fetchEmpleadoLogueado();
   }, []);
 
-  const handleEmpleadoSelect = (empleado) => {
-    // Establecer COD_UNICOM del empleado seleccionado
-    setCodUnicom(empleado.COD_UNICOM);
-    fetchCajas(empleado.COD_UNICOM);
-  };
-
+  // Obtener las cajas según el COD_UNICOM del empleado logueado
   const fetchCajas = async (codUnicom) => {
     try {
-      const response = await axios.get(`http://localhost:8080/cajas/${codUnicom}`);
-      setCajas(response.data.result); // Asignar el array de cajas
+      const response = await axios.get(`http://localhost:8080/getboxes?COD_UNICOM=${codUnicom}`);
+      setCajas(response.data.result); // Asignar las cajas al estado
     } catch (error) {
       console.error('Error fetching cajas:', error);
     }
   };
 
-  const handleTurnoClick = () => {
-    navigate('/dashboard');
+  // Manejar el cambio en el dropdown de empleados
+  const handleBoxChange = (cajaId, empleadoId) => {
+    setSelectedBoxes((prevSelectedBoxes) => ({
+      ...prevSelectedBoxes,
+      [cajaId]: empleadoId, // Guardar la selección de empleado para cada caja
+    }));
   };
 
-  const handleBoxChange = (index, value) => {
-    const newSelectedBoxes = [...selectedBoxes];
-    newSelectedBoxes[index] = value;
-    setSelectedBoxes(newSelectedBoxes);
+  // Navegar a la página de turnos
+  const handleTurnoClick = () => {
+    navigate('/dashboard');
   };
 
   return (
@@ -61,32 +61,18 @@ const CajaEmpleados = () => {
           <h1>Cajas</h1>
         </header>
 
-        <div className="employee-selection">
-          <h2>Selecciona un Empleado</h2>
-          <select onChange={(e) => handleEmpleadoSelect(JSON.parse(e.target.value))}>
-            <option value="">Selecciona un empleado</option>
-            {empleados.map((empleado) => (
-              <option key={empleado.id} value={JSON.stringify(empleado)}>
-                {empleado.nombrecompleto}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <div className="box">
-          {cajas.map((caja, index) => (
-            <div key={caja.id}>
+          {/* Mostrar las cajas */}
+          {cajas.map((caja) => (
+            <div key={caja.id} className="caja-item">
               <h2>{caja.nombre_box}</h2>
               <select
-                value={selectedBoxes[index]}
-                onChange={(e) => handleBoxChange(index, e.target.value)}
+                value={selectedBoxes[caja.id] || ''} // Selección actual para esta caja
+                onChange={(e) => handleBoxChange(caja.id, e.target.value)}
               >
-                <option value="">Selecciona un empleado</option>
-                {empleados.map((empleado) => (
-                  <option key={empleado.id} value={empleado.nombrecompleto}>
-                    {empleado.nombrecompleto}
-                  </option>
-                ))}
+                <option value={empleadoLogueado?.id}>
+                  {empleadoLogueado?.nombrecompleto} {/* Mostrar el empleado logueado */}
+                </option>
               </select>
             </div>
           ))}
