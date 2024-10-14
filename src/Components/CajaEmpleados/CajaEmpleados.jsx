@@ -4,36 +4,28 @@ import './CajaEmpleados.css';
 import { useNavigate } from 'react-router-dom';
 
 const CajaEmpleados = () => {
-  const [empleadoLogueado, setEmpleadoLogueado] = useState(null); // Estado para el empleado logueado
   const [cajas, setCajas] = useState([]); // Estado para almacenar las cajas
   const [selectedBoxes, setSelectedBoxes] = useState({}); // Para manejar las selecciones de empleados por caja
   const navigate = useNavigate();
 
-  // Obtener el empleado logueado y su COD_UNICOM
+  // Obtener las cajas según el COD_UNICOM desde el backend
   useEffect(() => {
-    const fetchEmpleadoLogueado = async () => {
+    const fetchCajas = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/login'); // Suponiendo que este endpoint devuelve el empleado logueado
-        const empleado = response.data;
-        setEmpleadoLogueado(empleado); // Guardar el empleado logueado
-        fetchCajas(empleado.COD_UNICOM); // Obtener cajas usando el COD_UNICOM
+        const response = await axios.get('http://localhost:8080/getboxes'); // Asume que este endpoint te dará las cajas basadas en el COD_UNICOM del empleado logueado
+        
+        if (response.data && response.data.result) {
+          setCajas(response.data.result); // Asignar las cajas al estado
+        } else {
+          console.error('No se encontraron cajas en la respuesta');
+        }
       } catch (error) {
-        console.error('Error fetching empleado logueado:', error);
+        console.error('Error fetching cajas:', error);
       }
     };
 
-    fetchEmpleadoLogueado();
+    fetchCajas();
   }, []);
-
-  // Obtener las cajas según el COD_UNICOM del empleado logueado
-  const fetchCajas = async (codUnicom) => {
-    try {
-      const response = await axios.get(`http://localhost:8080/getboxes?COD_UNICOM=${codUnicom}`);
-      setCajas(response.data.result); // Asignar las cajas al estado
-    } catch (error) {
-      console.error('Error fetching cajas:', error);
-    }
-  };
 
   // Manejar el cambio en el dropdown de empleados
   const handleBoxChange = (cajaId, empleadoId) => {
@@ -70,9 +62,8 @@ const CajaEmpleados = () => {
                 value={selectedBoxes[caja.id] || ''} // Selección actual para esta caja
                 onChange={(e) => handleBoxChange(caja.id, e.target.value)}
               >
-                <option value={empleadoLogueado?.id}>
-                  {empleadoLogueado?.nombrecompleto} {/* Mostrar el empleado logueado */}
-                </option>
+                <option value="">Seleccionar empleado</option>
+                {/* Aquí podrías agregar opciones de empleados si es necesario */}
               </select>
             </div>
           ))}
