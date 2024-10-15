@@ -8,6 +8,15 @@ const CajaEmpleados = () => {
   const [selectedBoxes, setSelectedBoxes] = useState({}); // Para manejar las selecciones de empleados por caja
   const navigate = useNavigate();
 
+  
+  useEffect(() => {
+    // Verificar el localStorage al montar el componente
+    if (!(localStorage.getItem("me") > 0)) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
+
   // Obtener las cajas según el COD_UNICOM desde el backend
   useEffect(() => {
     const fetchCajas = async () => {
