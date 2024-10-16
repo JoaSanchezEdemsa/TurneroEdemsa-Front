@@ -26,7 +26,7 @@ const CajaEmpleados = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:8080/getboxes', {
+        const response = await axios.get('http://localhost:8080/getboxesbyCod', {
           params: { codUnicom: sucursal },
         });
 
@@ -55,7 +55,7 @@ const CajaEmpleados = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:8080/getUsuarios', {
+        const response = await axios.get('http://localhost:8080/getUsuariosbyCod', {
           params: { codUnicom: sucursal }, // Usa el mismo parámetro
         });
 
