@@ -1,57 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const LoginWithToken = () => {
-  const [me, setMe] = useState(null); // Estado para almacenar la información del empleado
-  const [error, setError] = useState(null); // Estado para manejar errores
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       try {
         const params = new URLSearchParams(window.location.search);
-        const token = params.get('token'); // Obtener el token del parámetro de la URL
+        const token = params.get('token'); // Obtener el token de la URL
 
         if (!token) {
           throw new Error('No se encontró el token');
         }
 
-        const response = await fetch(`http://turnero:8080/login?token=${token}`, {
-          method: 'GET',
+        // Hacer la solicitud con el token
+        const response = await axios.get('http://turnero:8080/login', {
+          params: { token }, 
           headers: {
             'Content-Type': 'application/json',
           },
         });
 
-        // Verifica el estado HTTP
-        if (!response.ok) {
-          throw new Error('Error en la solicitud'); // Captura errores de estado
+        // Verificar si la respuesta fue exitosa y los datos son correctos
+        if (!response.data.success || response.data.result === false) {
+          throw new Error('No se encontraron datos para el token proporcionado');
+        }
+                
+        localStorage.setItem('me', response.data.result.nick); // Almacenar en el localStorage
+
+        // Verifica si el objeto 'response.data.result' tiene datos válidos
+      if (response.data.result && response.data.result.usuarioOPEN) {
+          // Si el objeto tiene el atributo COD_UNICOM, lo almacenas en localStorage
+          localStorage.setItem('sucursal', response.data.result.usuarioOPEN.COD_UNICOM);
+        } else {
+              localStorage.setItem('sucursal', null); // Almacena un valor por defecto si no hay datos
         }
 
-        const data = await response.json();
-        setMe(data); // Asigna el resultado a 'me', que es el empleadoData
+
+        navigate('/dashboard'); // Navegar a la página de inicio
 
       } catch (err) {
-        setError(err.message); // Guarda el mensaje de error
+        return "error";
       }
     };
 
-    fetchData();
-  }, []); // Se ejecuta una vez al montar el componente
+    fetchData(); // Solo dispara una vez
 
-  return (
-    <div>
-      <h1>Información del Empleado</h1>
-      {error && <p>Error: {error}</p>} {/* Muestra el error si existe */}
-      {me && (
-        <ul>
-          {/* Si 'me' es un objeto, puedes iterar sobre sus propiedades */}
-          {Object.entries(me).map(([key, value]) => (
-            <li key={key}>
-              <strong>{key}:</strong> {JSON.stringify(value)}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+  }, []); // Vacío significa que se ejecuta solo una vez al montar
+
+  return (""
   );
 };
 

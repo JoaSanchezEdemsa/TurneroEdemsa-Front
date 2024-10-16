@@ -1,0 +1,31 @@
+/* Header.css */
+.App-header {
+    display: flex;
+    justify-content: space-between; /* Espacio entre el título y el botón */
+    align-items: center; /* Centra verticalmente el contenido */
+    padding: 20px; /* Espaciado igual al de App.css */
+    background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco con opacidad */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Sombra similar a los divs en App.css */
+  }
+  
+  .header-title {
+    color: black; /* Título en negro para seguir el diseño */
+    margin: 0; /* Elimina margen por defecto */
+  }
+  
+  .header-button {
+    padding: 10px 20px; /* Espaciado en el botón */
+    font-size: 16px; /* Tamaño del texto */
+    color: white; /* Color del texto del botón */
+    background-color: #007bff; /* Color de fondo del botón */
+    border: none; /* Sin borde */
+    border-radius: 4px; /* Bordes redondeados en el botón */
+    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+    transition: background-color 0.3s ease; /* Transición para el cambio de color */
+  }
+  
+  .header-button:hover {
+    background-color: #0056b3; /* Color del botón al pasar el mouse */
+  }
+  

@@ -5,35 +5,73 @@ import { useNavigate } from 'react-router-dom';
 
 const CajaEmpleados = () => {
   const [cajas, setCajas] = useState([]); // Estado para almacenar las cajas
+  const [usuarios, setUsuarios] = useState([]); // Estado para almacenar los usuarios
   const [selectedBoxes, setSelectedBoxes] = useState({}); // Para manejar las selecciones de empleados por caja
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     // Verificar el localStorage al montar el componente
     if (!(localStorage.getItem("me") > 0)) {
-      navigate('/login');
+      navigate('/');
     }
   }, [navigate]);
-
 
   // Obtener las cajas según el COD_UNICOM desde el backend
   useEffect(() => {
     const fetchCajas = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/getboxes'); // Asume que este endpoint te dará las cajas basadas en el COD_UNICOM del empleado logueado
-        
-        if (response.data && response.data.result) {
+        const sucursal = localStorage.getItem('sucursal');
+        if (!sucursal) {
+          console.error('No se encontró la sucursal en el localStorage');
+          return;
+        }
+
+        const response = await axios.get('http://localhost:8080/getboxes', {
+          params: { codUnicom: sucursal },
+        });
+
+        if (response.data && Array.isArray(response.data.result)) {
           setCajas(response.data.result); // Asignar las cajas al estado
         } else {
-          console.error('No se encontraron cajas en la respuesta');
+          console.error('No se encontraron cajas o el formato es incorrecto');
+          setCajas([]); // Asegúrate de manejar este caso
         }
       } catch (error) {
         console.error('Error fetching cajas:', error);
+        setCajas([]); // En caso de error, asegura que sea un array vacío
       }
     };
 
     fetchCajas();
+  }, []);
+
+  // Obtener los usuarios desde el backend
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+        const sucursal = localStorage.getItem('sucursal');
+        if (!sucursal) {
+          console.error('No se encontró la sucursal en el localStorage');
+          return;
+        }
+
+        const response = await axios.get('http://localhost:8080/getUsuarios', {
+          params: { codUnicom: sucursal }, // Usa el mismo parámetro
+        });
+
+        if (response.data && Array.isArray(response.data.result)) {
+          setUsuarios(response.data.result); // Asignar los usuarios al estado
+        } else {
+          console.error('No se encontraron usuarios o el formato es incorrecto');
+          setUsuarios([]); // Asegúrate de manejar este caso
+        }
+      } catch (error) {
+        console.error('Error fetching usuarios:', error);
+        setUsuarios([]); // En caso de error, asegura que sea un array vacío
+      }
+    };
+
+    fetchUsuarios();
   }, []);
 
   // Manejar el cambio en el dropdown de empleados
@@ -72,7 +110,12 @@ const CajaEmpleados = () => {
                 onChange={(e) => handleBoxChange(caja.id, e.target.value)}
               >
                 <option value="">Seleccionar empleado</option>
-                {/* Aquí podrías agregar opciones de empleados si es necesario */}
+                {/* Agregar opciones de usuarios al dropdown */}
+                {usuarios.map((usuario) => (
+                  <option key={usuario.LEGAJO} value={usuario.LEGAJO}>
+                    {usuario.NOMBRECOMPLETO} {/* Cambia 'nombre' por el atributo adecuado de usuario */}
+                  </option>
+                ))}
               </select>
             </div>
           ))}

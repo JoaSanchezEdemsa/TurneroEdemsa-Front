@@ -1,9 +1,18 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+
+
+  useEffect(() => {
+    // Verificar el localStorage al montar el componente
+    if (!(localStorage.getItem("me") > 0)) {
+      navigate('/');
+    }
+  }, [navigate]);
   
   const empleados = [
     { hora: "10:10", nombre: "Pepito Hongito", DNI: "45034923", id: "300009" },
@@ -13,7 +22,7 @@ const Dashboard = () => {
   ];
 
   const handleCajasClick = () => {
-    navigate('/');
+    navigate('/boxes');
   };
 
   return (

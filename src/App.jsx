@@ -6,16 +6,24 @@ import CajaEmpleados from './Components/CajaEmpleados/CajaEmpleados';
 import Session from './Components/Session/Session';
 import LoginWithToken from './Components/LoginWithToken/LoginWithToken';  
 import Login from './Components/Login/Login';
+import Header from './Components/Header/Header';
 function App() {
   return (
     <Router>
-      
           <Routes>
-            <Route path="/boxes" element={<CajaEmpleados />} /> 
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/boxes" element={<>
+                <Header/>
+                <CajaEmpleados />
+                </>}
+              />
+            <Route path="/dashboard" element={<>
+                <Header/>
+                <Dashboard />
+                </>}
+              />
             <Route path="/session" element={<Session />} />
             <Route path="/loginwithtoken" element={<LoginWithToken/>}/>
-            <Route path="/login" element={<Login/>}/>
+            <Route path="/" element={<Login/>}/>
           </Routes>
       
     </Router>
