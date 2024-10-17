@@ -45,11 +45,15 @@ const Dashboard = () => {
     navigate('/boxes');
   };
 
+  const handleConfigClick = () => {
+    navigate('/config');
+  };
+
   return (
     <div className="dashboard-page">
       <aside className="sidebar">
         <button className="sidebar-button">Turnos</button>
-        <button className="sidebar-button">Configuración</button>
+        <button onClick={handleConfigClick} className="sidebar-button">Configuración</button>
         <button onClick={handleCajasClick} className="sidebar-button">
           Asignación de empleados
         </button>

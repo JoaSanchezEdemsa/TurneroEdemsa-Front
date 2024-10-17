@@ -1,0 +1,50 @@
+/* Configuracion.css */
+.configuracion-page {
+  display: flex;
+  height: 100vh;
+  width: 1200px;
+  font-family: Arial, sans-serif;
+}
+
+.sidebar {
+  width: 200px; /* Mantiene el mismo ancho que el dashboard */
+  background-color: #f4f4f4;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar-button {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #ddd;
+  border: none;
+  cursor: pointer;
+}
+
+.sidebar-button:hover {
+  background-color: #ccc;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.configuracion-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.configuracion-content p {
+  font-size: 16px;
+  color: #666;
+}

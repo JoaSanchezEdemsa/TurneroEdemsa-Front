@@ -16,6 +16,8 @@ const CajaEmpleados = () => {
     }
   }, [navigate]);
 
+  
+
   // Obtener las cajas según el COD_UNICOM desde el backend
   useEffect(() => {
     const fetchCajas = async () => {
@@ -87,11 +89,15 @@ const CajaEmpleados = () => {
     navigate('/dashboard');
   };
 
+  const handleConfigClick = () => {
+    navigate('/config');
+  };
+
   return (
     <div className="cajas-page">
       <aside className="sidebar">
         <button onClick={handleTurnoClick} className="sidebar-button">Turnos</button>
-        <button className="sidebar-button">Configuración</button>
+        <button onClick={handleConfigClick} className="sidebar-button">Configuración</button>
         <button className="sidebar-button">Asignación de empleados</button>
       </aside>
 

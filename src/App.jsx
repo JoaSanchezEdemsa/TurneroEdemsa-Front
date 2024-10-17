@@ -7,6 +7,8 @@ import Session from './Components/Session/Session';
 import LoginWithToken from './Components/LoginWithToken/LoginWithToken';  
 import Login from './Components/Login/Login';
 import Header from './Components/Header/Header';
+import Configuracion from './Components/Configuracion/Configuracion';
+
 function App() {
   return (
     <Router>
@@ -19,6 +21,12 @@ function App() {
             <Route path="/dashboard" element={<>
                 <Header/>
                 <Dashboard />
+                </>}
+              />
+
+            <Route path="/config" element={<>
+                <Header/>
+                <Configuracion />
                 </>}
               />
             <Route path="/session" element={<Session />} />
