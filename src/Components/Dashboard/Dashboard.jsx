@@ -2,24 +2,44 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-
-
+  const [turnos, setTurnos] = useState([]);
+  
   useEffect(() => {
-    // Verificar el localStorage al montar el componente
     if (!(localStorage.getItem("me") > 0)) {
       navigate('/');
     }
   }, [navigate]);
-  
-  const empleados = [
-    { hora: "10:10", nombre: "Pepito Hongito", DNI: "45034923", id: "300009" },
-    { hora: "10:20", nombre: "Pepito Hongito", DNI: "45034923", id: "300009" },
-    { hora: "10:30", nombre: "Pepito Hongito", DNI: "45034923", id: "300009" },
-    // Añade más datos según sea necesario
-  ];
+
+  useEffect(() => {
+    const fetchTurnos = async () => {
+      try {
+        const sucursal = localStorage.getItem('sucursal');
+        if (!sucursal) {
+          console.error('No se encontró la sucursal en el localStorage');
+          return;
+        }
+
+        const response = await axios.get('http://localhost:8080/getturnosbycod', {
+          params: { COD_UNICOM: sucursal },
+        });
+
+        if (response.data && Array.isArray(response.data.result)) {
+          setTurnos(response.data.result);
+        } else {
+          console.error('No se encontraron turnos para la sucursal');
+          setTurnos([]);
+        }
+      } catch (error) {
+        console.error('Error al obtener turnos:', error);
+      }
+    };
+    fetchTurnos();
+  }, []);
+
 
   const handleCajasClick = () => {
     navigate('/boxes');
@@ -57,12 +77,12 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {empleados.map((empleado, index) => (
+              {turnos.map((turno, index) => (
                 <tr key={index}>
-                  <td>{empleado.hora}</td>
-                  <td>{empleado.nombre}</td>
-                  <td>{empleado.DNI}</td>
-                  <td>{empleado.id}</td>
+                  <td>{turno.fecha_turno}</td>
+                  <td>{turno.cliente}</td>
+                  <td>{turno.dni}</td>
+                  <td>{turno.id}</td>
                   <td><button className="action-button">Acción</button></td>
                 </tr>
               ))}
