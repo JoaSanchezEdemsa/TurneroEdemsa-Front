@@ -5,19 +5,26 @@ import { useNavigate } from 'react-router-dom';
 
 const Configuracion = () => {
   const navigate = useNavigate();
-  const [permiso, setPermisos] = useState(null); // Ahora solo manejamos un objeto de permisos en vez de array.
+  const [permiso, setPermisos] = useState(null); // Estado para los permisos
+  const [nick, setNick] = useState(''); // Estado para almacenar el nick
+  const [isAdmin, setIsAdmin] = useState(false); // Estado para verificar si es admin
 
   useEffect(() => {
     // Verificar el localStorage al montar el componente
-    if (!(localStorage.getItem("me") > 0)) {
+    const storedNick = localStorage.getItem("me");
+    if (!(storedNick > 0)) {
       navigate('/');
+    } else {
+      setNick(storedNick);
+      if (storedNick === '2000826') {
+        setIsAdmin(true); // Si el nick es 2000826, el usuario es admin
+      }
     }
   }, [navigate]);
 
   useEffect(() => {
     const fetchPermisos = async () => {
       try {
-        const nick = localStorage.getItem('me');
         if (!nick) {
           console.error('No se encontró el nick en el localStorage');
           return;
@@ -28,7 +35,7 @@ const Configuracion = () => {
         });
 
         if (response.data && response.data.result) {
-          setPermisos(response.data.result); // Guardamos todos los permisos en el estado
+          setPermisos(response.data.result); // Guardamos los permisos en el estado
         } else {
           console.error('No se encontraron permisos con ese nick');
           setPermisos(null);
@@ -37,10 +44,39 @@ const Configuracion = () => {
         console.error('Error al obtener permisos:', error);
       }
     };
-    fetchPermisos();
-  }, []);
+    if (nick) {
+      fetchPermisos();
+    }
+  }, [nick]);
 
-  // Función para traducir los permisos a texto legible
+  // Función para alternar los permisos (Sí/No)
+  const togglePermiso = async (permisoCategory, permisoKey) => {
+    if (permiso && permiso[permisoCategory]) {
+      const nuevoValor = !permiso[permisoCategory][permisoKey];
+      const updatedPermisos = {
+        ...permiso,
+        [permisoCategory]: {
+          ...permiso[permisoCategory],
+          [permisoKey]: nuevoValor,
+        },
+      };
+
+      setPermisos(updatedPermisos); // Actualizamos el estado local
+
+      try {
+        // Aquí puedes hacer una llamada al backend para actualizar el permiso
+        await axios.post('http://localhost:8080/updatePermiso', {
+          nick: nick,
+          category: permisoCategory,
+          key: permisoKey,
+          value: nuevoValor,
+        });
+      } catch (error) {
+        console.error('Error al actualizar el permiso:', error);
+      }
+    }
+  };
+
   const traducirPermiso = (permiso) => {
     return permiso ? 'Sí' : 'No';
   };
@@ -62,14 +98,19 @@ const Configuracion = () => {
           <h2>Permisos - Turnero</h2>
           {permiso && permiso.turnero ? (
             <ul className="permisos-list">
-              <li>Añadir boxes: {traducirPermiso(permiso.turnero.add_boxes)}</li>
-              <li>Añadir motivos de visita: {traducirPermiso(permiso.turnero.add_motivosvisita)}</li>
-              <li>Administrar usuarios por box: {traducirPermiso(permiso.turnero.admin_usuarios_x_box)}</li>
-              <li>Eliminar boxes: {traducirPermiso(permiso.turnero.del_boxes)}</li>
-              <li>Eliminar motivos de visita: {traducirPermiso(permiso.turnero.del_motivosvisita)}</li>
-              <li>Llamar turno: {traducirPermiso(permiso.turnero.llamar_turno)}</li>
-              <li>Ver motivos de visita: {traducirPermiso(permiso.turnero.ver_motivosvisita)}</li>
-              <li>Ver turnos: {traducirPermiso(permiso.turnero.ver_turnos)}</li>
+              {Object.keys(permiso.turnero).map((permisoKey) => (
+                <li key={permisoKey}>
+                  {permisoKey.replace(/_/g, ' ')}: {traducirPermiso(permiso.turnero[permisoKey])}
+                  {isAdmin && (
+                    <button
+                      className="toggle-permiso-btn"
+                      onClick={() => togglePermiso('turnero', permisoKey)}
+                    >
+                      Cambiar a {permiso.turnero[permisoKey] ? 'No' : 'Sí'}
+                    </button>
+                  )}
+                </li>
+              ))}
             </ul>
           ) : (
             <p>Cargando permisos...</p>
