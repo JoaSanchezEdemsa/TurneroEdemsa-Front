@@ -1,55 +1,162 @@
-/* Header.css */
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
 .App-header {
   display: flex;
-  justify-content: space-between; /* Espacio entre los elementos de la izquierda y la derecha */
-  align-items: center; /* Centrar verticalmente el contenido */
-  padding: 20px;
-  background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco con opacidad */
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background-color: rgba(250, 250, 250, 0.95); /* Fondo blanco suave con mayor opacidad */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .header-left {
-  flex-grow: 1; /* Mantiene el título alineado a la izquierda */
+  flex-grow: 1;
+  margin-right: 10px;
 }
 
 .title {
-  font-size: 31px;
-  font-weight: bold;
-  color: black;
+  font-size: 28px;
+  font-weight: 600;
+  color: #222; /* Color de texto más oscuro para mejor contraste */
   margin: 0;
+  letter-spacing: 0.5px;
 }
 
 .header-right {
   display: flex;
-  align-items: center; /* Alinear la imagen y el nombre del usuario verticalmente */
+  align-items: center;
 }
 
 .user-avatar {
-  width: 35px; /* Tamaño de la imagen */
-  height: 35px;
-  border-radius: 50%; /* Para que la imagen tenga forma circular */
-  margin-right: 10px; /* Espaciado entre la imagen y el nombre */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 15px;
+  border: 2px solid #007bff;
 }
 
 .user-name {
-  font-size: 18px;
-  font-weight: bold;
-  color: black; /* Mantener el mismo color negro que el título anterior */
-  margin-right: 20px; /* Espaciado entre el nombre y el botón */
+  font-size: 17px;
+  font-weight: 500;
+  color: #444; /* Texto un poco más oscuro */
+  margin-right: 25px;
 }
 
-.header-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  color: white;
+/* Botones del header */
+.header-button,
+.status-button,
+.sidebar-button {
+  padding: 10px 18px;
+  font-size: 15px;
+  color: #fff;
   background-color: #007bff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.header-button:hover {
+.header-button:hover,
+.status-button:hover,
+.sidebar-button:hover {
   background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.sidebar-button.active {
+  background-color: #ff6f61; /* Color destacado para el botón activo */
+}
+
+.sidebar-button.active:hover {
+  background-color: #e3554b;
+}
+
+/* Botones de acción */
+.action-button,
+.action-button-secondary {
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.action-button {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.action-button:hover {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+.action-button-secondary {
+  background-color: #dc3545;
+}
+
+.action-button-secondary:hover {
+  background-color: #c82333;
+  transform: scale(1.05);
+}
+
+/* Estilos para la sidebar */
+.sidebar {
+  width: 240px;
+  background-color: #f1f3f5;
+  padding: 20px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 20px;
+  height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-button {
+  display: flex;
+  align-items: center; /* Centrar verticalmente */
+  justify-content: center; /* Centrar horizontalmente */
+  margin-bottom: 15px;
+  padding: 12px;
+  background-color: #007bff; /* Color de fondo del botón */
+  color: #fff; /* Color del texto */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.sidebar-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+/* Botón activo en la sidebar */
+.sidebar-button.active {
+  background-color: #ff6f61; /* Color destacado para el botón activo */
+}
+
+.sidebar-button.active:hover {
+  background-color: #e3554b;
+}
+
+/* Tipografía en la sidebar */
+.sidebar-button {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-align: center; /* Asegurar que el texto esté centrado */
 }

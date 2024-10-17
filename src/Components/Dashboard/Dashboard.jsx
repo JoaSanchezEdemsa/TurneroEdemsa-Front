@@ -58,7 +58,7 @@ const Dashboard = () => {
           Asignación de empleados
         </button>
       </aside>
-
+  
       <main className="content">
         <header className="header">
           <h1>Clientes</h1>
@@ -68,14 +68,14 @@ const Dashboard = () => {
             <button className="status-button">Finalizado</button>
           </div>
         </header>
-
+  
         <div className="empleado-table-container">
           <table className="empleado-table">
             <thead>
               <tr>
                 <th>Hora</th>
-                <th>Nombre</th>
-                <th>DNI</th>
+                <th>Cliente</th>
+                <th>Motivo</th>
                 <th>ID</th>
                 <th>Acciones</th>
               </tr>
@@ -83,11 +83,16 @@ const Dashboard = () => {
             <tbody>
               {turnos.map((turno, index) => (
                 <tr key={index}>
-                  <td>{turno.fecha_turno}</td>
+                  <td>{turno.hora}</td>
                   <td>{turno.cliente}</td>
-                  <td>{turno.dni}</td>
+                  <td>{turno.motivo}</td>
                   <td>{turno.id}</td>
-                  <td><button className="action-button">Acción</button></td>
+                  <td>
+                    <div className="action-buttons">
+                      <button className="action-button">Llamar</button>
+                      <button className="action-button action-button-secondary">Finalizar</button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -96,6 +101,7 @@ const Dashboard = () => {
       </main>
     </div>
   );
+  
 };
 
 export default Dashboard;

@@ -25,7 +25,7 @@ const Header = () => {
   return (
     <header className="App-header">
       <div className="header-left">
-        <h1 className="title">Turnero</h1> {/* Título a la izquierda */}
+        <h1 className="title">Turnero | Dashboard</h1> {/* Título a la izquierda */}
       </div>
       <div className="header-right"> {/* Imagen y nombre del usuario a la derecha */}
         <img src={perfil} alt="User Avatar" className="user-avatar" />
@@ -39,3 +39,4 @@ const Header = () => {
 };
 
 export default Header;
+  
