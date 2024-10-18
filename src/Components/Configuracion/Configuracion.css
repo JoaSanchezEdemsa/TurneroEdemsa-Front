@@ -44,7 +44,75 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Espaciado adicional para la lista de permisos */
+.configuracion-content ul {
+  margin-top: 20px; /* Añade espacio en la parte superior de la lista */
+  list-style-type: none; /* Elimina los puntos de la lista */
+  padding-left: 0; /* Elimina el padding por defecto */
+}
+
 .configuracion-content p {
   font-size: 16px;
   color: #666;
 }
+
+.vista-administrador {
+  margin-top: 40px; /* Espacio adicional antes de la vista del administrador */
+  padding: 20px; /* Añade padding para mejor presentación */
+  border-top: 1px solid #ddd; /* Línea separadora */
+}
+
+/* Estilo para el botón de cambiar permisos */
+.cambiar-permisos-button {
+  background-color: #007bff; /* Color azul similar al botón de salir */
+  color: white; /* Texto blanco */
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px; /* Espacio entre el nombre y el botón */
+}
+
+.cerrar-button {
+  background-color: #007bff; /* Color azul similar al botón de salir */
+  color: white; /* Texto blanco */
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px; /* Espacio entre el nombre y el botón */
+}
+
+.cambiar-permisos-button:hover, .cerrar-button:hover {
+  background-color: #0056b3; /* Color más oscuro al pasar el mouse */
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+}
+.admin-section ul {
+  list-style-type: none; /* Para quitar los puntos de la lista */
+  padding: 0; /* Para eliminar el padding por defecto */
+}
+
+.admin-section li {
+  margin-bottom: 15px; /* Espaciado entre elementos de la lista */
+}
+
+
