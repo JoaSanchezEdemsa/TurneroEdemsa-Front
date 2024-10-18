@@ -56,11 +56,15 @@ const Dashboard = () => {
     setSelectedTurno(null); // Limpiamos el turno seleccionado
   };
 
+  const handleClick = () => {
+    navigate('/config');
+  };
+
   return (
     <div className="dashboard-page">
       <div className="sidebar">
         <button className="sidebar-button">Turnos</button>
-        <button className="sidebar-button">Configuración</button>
+        <button onClick={handleClick} className="sidebar-button">Configuración</button>
         <button onClick={handleCajasClick} className="sidebar-button">
           Asignación de empleados
         </button>

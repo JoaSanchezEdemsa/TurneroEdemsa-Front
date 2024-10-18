@@ -5,26 +5,19 @@ import { useNavigate } from 'react-router-dom';
 
 const Configuracion = () => {
   const navigate = useNavigate();
-  const [permiso, setPermisos] = useState(null); // Estado para los permisos
-  const [nick, setNick] = useState(''); // Estado para almacenar el nick
-  const [isAdmin, setIsAdmin] = useState(false); // Estado para verificar si es admin
+  const [permisos, setPermisos] = useState(null);
 
   useEffect(() => {
     // Verificar el localStorage al montar el componente
-    const storedNick = localStorage.getItem("me");
-    if (!(storedNick > 0)) {
+    if (!(localStorage.getItem('me') > 0)) {
       navigate('/');
-    } else {
-      setNick(storedNick);
-      if (storedNick === '2000826') {
-        setIsAdmin(true); // Si el nick es 2000826, el usuario es admin
-      }
     }
   }, [navigate]);
 
   useEffect(() => {
     const fetchPermisos = async () => {
       try {
+        const nick = localStorage.getItem('me');
         if (!nick) {
           console.error('No se encontró el nick en el localStorage');
           return;
@@ -34,8 +27,8 @@ const Configuracion = () => {
           params: { NICK: nick },
         });
 
-        if (response.data && response.data.result) {
-          setPermisos(response.data.result); // Guardamos los permisos en el estado
+        if (response.data) {
+          setPermisos(response.data.result);
         } else {
           console.error('No se encontraron permisos con ese nick');
           setPermisos(null);
@@ -44,42 +37,8 @@ const Configuracion = () => {
         console.error('Error al obtener permisos:', error);
       }
     };
-    if (nick) {
-      fetchPermisos();
-    }
-  }, [nick]);
-
-  // Función para alternar los permisos (Sí/No)
-  const togglePermiso = async (permisoCategory, permisoKey) => {
-    if (permiso && permiso[permisoCategory]) {
-      const nuevoValor = !permiso[permisoCategory][permisoKey];
-      const updatedPermisos = {
-        ...permiso,
-        [permisoCategory]: {
-          ...permiso[permisoCategory],
-          [permisoKey]: nuevoValor,
-        },
-      };
-
-      setPermisos(updatedPermisos); // Actualizamos el estado local
-
-      try {
-        // Aquí puedes hacer una llamada al backend para actualizar el permiso
-        await axios.post('http://localhost:8080/updatePermiso', {
-          nick: nick,
-          category: permisoCategory,
-          key: permisoKey,
-          value: nuevoValor,
-        });
-      } catch (error) {
-        console.error('Error al actualizar el permiso:', error);
-      }
-    }
-  };
-
-  const traducirPermiso = (permiso) => {
-    return permiso ? 'Sí' : 'No';
-  };
+    fetchPermisos();
+  }, []);
 
   return (
     <div className="configuracion-page">
@@ -95,23 +54,21 @@ const Configuracion = () => {
         </header>
 
         <div className="configuracion-content">
-          <h2>Permisos - Turnero</h2>
-          {permiso && permiso.turnero ? (
-            <ul className="permisos-list">
-              {Object.keys(permiso.turnero).map((permisoKey) => (
-                <li key={permisoKey}>
-                  {permisoKey.replace(/_/g, ' ')}: {traducirPermiso(permiso.turnero[permisoKey])}
-                  {isAdmin && (
-                    <button
-                      className="toggle-permiso-btn"
-                      onClick={() => togglePermiso('turnero', permisoKey)}
-                    >
-                      Cambiar a {permiso.turnero[permisoKey] ? 'No' : 'Sí'}
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
+          {/* Sección de permisos */}
+          {permisos ? (
+            <div className="permisos-section">
+              <h2>Permisos - Turnero</h2>
+              <ul>
+                <li>Añadir boxes: {permisos.turnero.add_boxes ? 'Si' : 'No'}</li>
+                <li>Añadir motivos de visita: {permisos.turnero.add_motivosvisita ? 'Si' : 'No'}</li>
+                <li>Administrar usuarios en boxes: {permisos.turnero.admin_usuarios_x_box ? 'Si' : 'No'}</li>
+                <li>Eliminar boxes: {permisos.turnero.del_boxes ? 'Si' : 'No'}</li>
+                <li>Eliminar motivos de visita: {permisos.turnero.del_motivosvisita ? 'Si' : 'No'}</li>
+                <li>Llamar turno: {permisos.turnero.llamar_turno ? 'Si' : 'No'}</li>
+                <li>Ver motivos de visita: {permisos.turnero.ver_motivosvisita ? 'Si' : 'No'}</li>
+                <li>Ver turnos: {permisos.turnero.ver_turnos ? 'Si' : 'No'}</li>
+              </ul>
+            </div>
           ) : (
             <p>Cargando permisos...</p>
           )}
