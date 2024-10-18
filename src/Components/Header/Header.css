@@ -16,6 +16,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  margin-bottom: 10px;
 }
 
 .header-left {
@@ -53,8 +54,7 @@
 
 /* Botones del header */
 .header-button,
-.status-button,
-.sidebar-button {
+.status-button {
   padding: 10px 18px;
   font-size: 15px;
   color: #fff;
@@ -66,19 +66,11 @@
 }
 
 .header-button:hover,
-.status-button:hover,
-.sidebar-button:hover {
+.status-button:hover {
   background-color: #0056b3;
   transform: scale(1.05);
 }
 
-.sidebar-button.active {
-  background-color: #ff6f61; /* Color destacado para el botón activo */
-}
-
-.sidebar-button.active:hover {
-  background-color: #e3554b;
-}
 
 /* Botones de acción */
 .action-button,
@@ -109,7 +101,6 @@
   transform: scale(1.05);
 }
 
-/* Estilos para la sidebar */
 .sidebar {
   width: 240px;
   background-color: #f1f3f5;
@@ -122,41 +113,39 @@
   height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
+  justify-content: flex-start; /* Alinea los botones al inicio */
 }
 
+/* Estilos para los botones de la sidebar */
 .sidebar-button {
   display: flex;
   align-items: center; /* Centrar verticalmente */
   justify-content: center; /* Centrar horizontalmente */
   margin-bottom: 15px;
   padding: 12px;
-  background-color: #007bff; /* Color de fondo del botón */
-  color: #fff; /* Color del texto */
+  background-color: #007bff; /* Color de fondo azul */
+  color: #fff; /* Color del texto blanco */
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.sidebar-button:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
-}
-
-/* Botón activo en la sidebar */
-.sidebar-button.active {
-  background-color: #ff6f61; /* Color destacado para el botón activo */
-}
-
-.sidebar-button.active:hover {
-  background-color: #e3554b;
-}
-
-/* Tipografía en la sidebar */
-.sidebar-button {
   font-family: 'Poppins', sans-serif;
   font-size: 16px;
   font-weight: 500;
   letter-spacing: 0.3px;
-  text-align: center; /* Asegurar que el texto esté centrado */
+  text-align: center; /* Texto centrado */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Animación en hover */
+}
+
+.sidebar-button:hover {
+  background-color: #0056b3; /* Azul más oscuro al pasar el mouse */
+  transform: scale(1.05); /* Animación de agrandamiento */
+}
+
+/* Estilo para el botón activo */
+.sidebar-button.active {
+  background-color: #ff6f61; /* Color especial para el botón activo */
+}
+
+.sidebar-button.active:hover {
+  background-color: #e3554b; /* Color más oscuro cuando el botón activo es hover */
 }

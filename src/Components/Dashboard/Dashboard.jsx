@@ -50,13 +50,13 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-page">
-      <aside className="sidebar">
+      <div className="sidebar">
         <button className="sidebar-button">Turnos</button>
         <button onClick={handleConfigClick} className="sidebar-button">Configuración</button>
         <button onClick={handleCajasClick} className="sidebar-button">
           Asignación de empleados
         </button>
-      </aside>
+      </div>
   
       <main className="content">
         <header className="header">
