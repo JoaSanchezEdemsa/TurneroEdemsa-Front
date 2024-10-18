@@ -150,7 +150,6 @@
   font-size: 20px; 
 }
 
-/* Estilos para el modal */
 .modal {
   position: fixed;
   top: 0;
@@ -163,8 +162,9 @@
   align-items: center;
 }
 
-h2{
+p{
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .modal-content {
@@ -176,7 +176,7 @@ h2{
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centrar contenido */
+  align-items: center; 
 }
 
 .close-button {
@@ -187,14 +187,14 @@ h2{
   border: none;
   cursor: pointer;
   font-size: 24px;
-  color: blue; /* Cambiamos el color de la "X" a azul */
+  color: blue; 
 }
 
 .modal-buttons {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Espacio entre botones */
-  width: 100%; /* Asegura que los botones ocupen todo el ancho del modal */
+  gap: 10px; 
+  width: 100%; 
 }
 
 .modal-action-button {
@@ -206,12 +206,44 @@ h2{
   cursor: pointer;
   transition: background-color 0.3s ease;
   text-align: center;
-  width: 100%; /* Los botones ocupan el 100% del espacio disponible */
-  max-width: 300px; /* Limita el ancho máximo si deseas */
-  align-self: center; /* Centra los botones */
+  width: 100%; 
+  max-width: 300px; 
+  align-self: center; 
 }
 
 .modal-action-button:hover {
   background-color: #0056b3;
 }
 
+.modal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  margin-bottom: 10px; 
+}
+
+.modal-dropdown, .modal-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.modal-buttons-horizontal {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.modal-action-button {
+  flex: 1;
+  margin: 0 5px; 
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none; 
+  margin: 0; 
+}
