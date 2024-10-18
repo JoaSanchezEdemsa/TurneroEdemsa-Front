@@ -85,6 +85,7 @@ const Dashboard = () => {
             <thead>
               <tr>
                 <th>Hora</th>
+                <th>Procedencia</th>
                 <th>Cliente</th>
                 <th>Motivo</th>
                 <th>ID</th>
@@ -95,6 +96,7 @@ const Dashboard = () => {
               {turnos.map((turno, index) => (
                 <tr key={index}>
                   <td>{turno.hora}</td>
+                  <td>{turno.procedencia}</td>
                   <td>{turno.cliente}</td>
                   <td>{turno.motivo}</td>
                   <td>{turno.id}</td>

@@ -104,6 +104,10 @@ const CajaEmpleados = () => {
       <main className="content">
         <header className="header">
           <h1>Cajas</h1>
+          <div className="button-container">
+            <button className="add-box-button">Agregar Caja</button>
+            <button className="delete-box-button">Eliminar Caja</button>
+          </div>
         </header>
 
         <div className="box">

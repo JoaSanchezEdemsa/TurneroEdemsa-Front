@@ -2,6 +2,7 @@
 .cajas-page {
   display: flex;
   height: 100vh;
+  width: 130vh;
   font-family: Arial, sans-serif;
 }
 
@@ -35,38 +36,101 @@
 
 .header {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between; /* El título a la izquierda y los botones a la derecha */
+  align-items: center;
+  background-color: transparent; /* Asegura que el header no tenga fondo */
+  padding: 0; /* Elimina cualquier padding */
+  border: none; /* Elimina cualquier borde */
+  box-shadow: none; /* Elimina cualquier sombra */
 }
+
+.button-container {
+  display: flex;
+  gap: 10px; /* Espacio entre los botones */
+  background-color: transparent; /* Asegura que el contenedor no tenga fondo */
+  padding: 0; /* Sin relleno */
+  margin: 0; /* Sin margen */
+  border: none; /* Sin borde */
+  box-shadow: none; /* Sin sombra */
+}
+
+.add-box-button,
+.delete-box-button {
+  background-color: #28a745; /* Verde para "Agregar Caja" */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: none; /* Sin sombra */
+}
+
+.add-box-button:hover {
+  background-color: #218838; /* Verde oscuro en hover */
+}
+
+.delete-box-button {
+  background-color: #dc3545; /* Rojo para "Eliminar Caja" */
+  color: white;
+}
+
+.delete-box-button:hover {
+  background-color: #c82333; /* Rojo oscuro en hover */
+}
+
+.content {
+  background-color: transparent; /* Elimina cualquier fondo en el contenedor principal */
+  padding: 0; /* Elimina cualquier padding */
+  margin: 0; /* Sin margen */
+  border: none; /* Sin bordes */
+  box-shadow: none; /* Sin sombra */
+}
+
+
 
 .header h1 {
   font-size: 36px;
   font-weight: bold;
+  margin-left: 100px;
 }
 
-.box-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
+/* Ajustes para las cajas */
 .box {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  width: 100%;
 }
 
-.box select {
+.caja-item {
+  display: flex;
+  justify-content: space-between; /* Alinea el nombre de la caja a la izquierda y el selector a la derecha */
+  align-items: center;
+  padding: 10px ;
+  border-bottom: 1px solid #ddd;
+  
+}
+
+.caja-item h2 {
+  font-size: 18px;
+  margin: 0;
+  font-weight: bold;
+  text-align: left;
+  white-space: nowrap; /* Previene el salto de línea */
+  overflow: hidden; /* Evita que el texto sobrepase el contenedor */
+  text-overflow: ellipsis; /* Añade puntos suspensivos si el texto es muy largo */
+  padding: 20px;
+}
+
+
+.caja-item select {
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 5px;
   cursor: pointer;
+  width: 300px;
 }
 
-.box h2 {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.box select:focus {
+.caja-item select:focus {
   border-color: #007bff;
 }
