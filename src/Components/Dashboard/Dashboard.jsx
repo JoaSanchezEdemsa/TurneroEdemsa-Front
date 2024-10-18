@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { IoMdSettings } from "react-icons/io"; // Importa el ícono aquí
+import { IoMdSettings, IoMdClose } from "react-icons/io"; // Ícono de cierre
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [turnos, setTurnos] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+  const [selectedTurno, setSelectedTurno] = useState(null); // Turno seleccionado
 
   useEffect(() => {
     if (!(localStorage.getItem("me") > 0)) {
@@ -44,20 +46,26 @@ const Dashboard = () => {
     navigate('/boxes');
   };
 
-  const handleConfigClick = () => {
-    navigate('/config');
+  const handleConfigClick = (turno) => {
+    setSelectedTurno(turno); // Guardamos el turno seleccionado
+    setIsModalOpen(true); // Abrimos el modal
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false); // Cerramos el modal
+    setSelectedTurno(null); // Limpiamos el turno seleccionado
   };
 
   return (
     <div className="dashboard-page">
       <div className="sidebar">
         <button className="sidebar-button">Turnos</button>
-        <button onClick={handleConfigClick} className="sidebar-button">Configuración</button>
+        <button className="sidebar-button">Configuración</button>
         <button onClick={handleCajasClick} className="sidebar-button">
           Asignación de empleados
         </button>
       </div>
-  
+
       <main className="content">
         <header className="header">
           <h1>Clientes</h1>
@@ -67,7 +75,7 @@ const Dashboard = () => {
             <button className="status-button">Finalizado</button>
           </div>
         </header>
-  
+
         <div className="empleado-table-container">
           <table className="empleado-table">
             <thead>
@@ -90,7 +98,10 @@ const Dashboard = () => {
                     <div className="action-buttons">
                       <button className="action-button">Llamar</button>
                       <button className="action-button action-button-secondary">Finalizar</button>
-                      <button className="config-button action">
+                      <button 
+                        className="config-button action" 
+                        onClick={() => handleConfigClick(turno)} // Al hacer clic, pasamos el turno
+                      >
                         <IoMdSettings />
                       </button>
                     </div>
@@ -101,6 +112,23 @@ const Dashboard = () => {
           </table>
         </div>
       </main>
+
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <button className="close-button" onClick={closeModal}>
+              <IoMdClose />
+            </button>
+            <h2>Configuración del turno</h2>
+            {/* Lista de 3 botones para probar funcionalidades */}
+            <div className="modal-buttons">
+              <button className="modal-action-button">Acción 1</button>
+              <button className="modal-action-button">Acción 2</button>
+              <button className="modal-action-button">Acción 3</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

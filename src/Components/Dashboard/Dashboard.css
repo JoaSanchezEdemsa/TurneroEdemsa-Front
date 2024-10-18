@@ -150,4 +150,68 @@
   font-size: 20px; 
 }
 
+/* Estilos para el modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h2{
+  margin-bottom: 20px;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centrar contenido */
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: blue; /* Cambiamos el color de la "X" a azul */
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Espacio entre botones */
+  width: 100%; /* Asegura que los botones ocupen todo el ancho del modal */
+}
+
+.modal-action-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  width: 100%; /* Los botones ocupan el 100% del espacio disponible */
+  max-width: 300px; /* Limita el ancho máximo si deseas */
+  align-self: center; /* Centra los botones */
+}
+
+.modal-action-button:hover {
+  background-color: #0056b3;
+}
 
