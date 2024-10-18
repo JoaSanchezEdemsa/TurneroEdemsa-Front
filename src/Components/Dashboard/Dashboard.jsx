@@ -1,13 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { IoMdSettings } from "react-icons/io"; // Importa el ícono aquí
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [turnos, setTurnos] = useState([]);
-  
+
   useEffect(() => {
     if (!(localStorage.getItem("me") > 0)) {
       navigate('/');
@@ -39,7 +39,6 @@ const Dashboard = () => {
     };
     fetchTurnos();
   }, []);
-
 
   const handleCajasClick = () => {
     navigate('/boxes');
@@ -91,6 +90,9 @@ const Dashboard = () => {
                     <div className="action-buttons">
                       <button className="action-button">Llamar</button>
                       <button className="action-button action-button-secondary">Finalizar</button>
+                      <button className="config-button action">
+                        <IoMdSettings />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -101,7 +103,7 @@ const Dashboard = () => {
       </main>
     </div>
   );
-  
 };
 
 export default Dashboard;
+
