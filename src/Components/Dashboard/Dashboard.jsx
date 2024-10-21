@@ -9,6 +9,7 @@ const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTurno, setSelectedTurno] = useState(null);
   const [llamados, setLlamados] = useState({});
+  const [motivos, setMotivos] = useState([]);
 
   useEffect(() => {
     if (!(localStorage.getItem("me") > 0)) {
@@ -58,18 +59,26 @@ const Dashboard = () => {
 
   const handleLlamarClick = async (turnoId) => {
     const nick = localStorage.getItem('me');
-    
+
     if (!nick) {
       console.error('No se encontró el nick en el localStorage');
       return;
     }
+
     try {
-      await axios.post('http://turnero:8080/getstatusturno', {
-        params: { id: turnoId , nick : nick}, 
+      const response = await axios.post('http://localhost:8080/getstatusturno', {
+        id: turnoId,
+        NICK: nick,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-  
-      alert('Se ha llamado al cliente');
-  
+
+      if (response.data) {
+        alert('Se ha llamado al cliente');
+      }
+
       const updatedLlamados = {
         ...llamados,
         [turnoId]: true,
@@ -80,12 +89,24 @@ const Dashboard = () => {
       console.error('Error al enviar la solicitud:', error);
     }
   };
-  
+
+  const fetchMotivos = async () => {
+    try {
+      const response = await axios.post('http://localhost:8080/getmotivosopen');
+      if (response.data) {
+        setMotivos(response.data.result);
+      }
+    } catch (error) {
+      console.error('Error al obtener los motivos:', error);
+    }
+  };
 
   const handleFinalizarClick = (turno) => {
     setSelectedTurno(turno);
     setIsModalOpen(true);
+    fetchMotivos();
   };
+
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -176,13 +197,13 @@ const Dashboard = () => {
             <p>¿Está seguro de que desea finalizar el turno de {selectedTurno?.cliente}?</p>
             <div className="modal-options">
               <select className="modal-dropdown">
-                <option value="">Seleccione el motivo</option>
-                <option value="motivo1">Motivo 1</option>
-                <option value="motivo2">Motivo 2</option>
-                <option value="motivo3">Motivo 3</option>
+                <option value="" required>Seleccione el motivo</option>
+                {motivos.map((motivo, index) => (
+                  <option key={index} value={motivo.CODIGO}>{motivo.MOTIVO}</option>
+                ))}
               </select>
-              <input type="text" className="modal-input" placeholder="Descripción" />
-              <input type="number" className="modal-input" placeholder="NIC" pattern="\d*" />
+              <textarea className="modal-input" placeholder="Descripción" rows="3" required></textarea>
+              <input type="number" className="modal-input" placeholder="NIC" pattern="\d*" required/>
             </div>
 
             <div className="modal-buttons-horizontal">
@@ -200,4 +221,3 @@ const Dashboard = () => {
 
 export default Dashboard;
 
-//turnero/sucursales/turnos/llamar
