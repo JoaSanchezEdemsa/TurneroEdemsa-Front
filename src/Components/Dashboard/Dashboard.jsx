@@ -56,17 +56,31 @@ const Dashboard = () => {
     navigate('/config');
   };
 
-  const handleLlamarClick = (turnoId) => {
-    alert('Se ha llamado al cliente');
-
-    const updatedLlamados = {
-      ...llamados,
-      [turnoId]: true,
-    };
-    setLlamados(updatedLlamados);
-
-    localStorage.setItem('llamados', JSON.stringify(updatedLlamados));
+  const handleLlamarClick = async (turnoId) => {
+    const nick = localStorage.getItem('me');
+    
+    if (!nick) {
+      console.error('No se encontró el nick en el localStorage');
+      return;
+    }
+    try {
+      await axios.post('http://turnero:8080/getstatusturno', {
+        params: { id: turnoId , nick : nick}, 
+      });
+  
+      alert('Se ha llamado al cliente');
+  
+      const updatedLlamados = {
+        ...llamados,
+        [turnoId]: true,
+      };
+      setLlamados(updatedLlamados);
+      localStorage.setItem('llamados', JSON.stringify(updatedLlamados));
+    } catch (error) {
+      console.error('Error al enviar la solicitud:', error);
+    }
   };
+  
 
   const handleFinalizarClick = (turno) => {
     setSelectedTurno(turno);
@@ -91,8 +105,8 @@ const Dashboard = () => {
         <header className="header">
           <h1>Turnos</h1>
           <div className="status-buttons">
-            <button className='status-button'>Todos</button>
-            <button className="status-button">Pendiente</button>
+            <button className='status-button' title='Mostrar todos los turnos'>Todos</button>
+            <button className="status-button" title='Mostrar los turnos pendientes'>Pendiente</button>
             <button className="status-button">En Curso</button>
             <button className="status-button">Finalizado</button>
           </div>
@@ -102,9 +116,8 @@ const Dashboard = () => {
             <thead>
               <tr>
                 <th>Hora</th>
+                <th>Cliente | Motivo</th>
                 <th>Procedencia</th>
-                <th>Cliente</th>
-                <th>Motivo</th>
                 <th>NIC</th>
                 <th>Estado</th>
                 <th>Acciones</th>
@@ -114,16 +127,14 @@ const Dashboard = () => {
               {turnos.map((turno, index) => (
                 <tr key={index}>
                   <td>{turno.hora}</td>
-                  <td>{turno.procedencia}</td>
                   <td>
-                    {turno.cliente ? turno.cliente.split(' ').map((parte, idx) => (
-                      <React.Fragment key={idx}>
-                        {parte}
-                        <br />
-                      </React.Fragment>
-                    )) : '-'}
+                    {turno.cliente}
+                    <br />
+                    {turno.motivo ? turno.motivo : '-'}
                   </td>
-                  <td>{turno.motivo}</td>
+
+
+                  <td>{turno.procedencia}</td>
                   <td>
                     {turno.NIC ? turno.NIC.split(',').map((nicPart, idx) => (
                       <React.Fragment key={idx}>
@@ -188,3 +199,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+//turnero/sucursales/turnos/llamar
