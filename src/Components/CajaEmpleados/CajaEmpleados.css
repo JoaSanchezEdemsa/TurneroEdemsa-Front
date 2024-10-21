@@ -1,8 +1,9 @@
+
 /* Estructura principal */
 .cajas-page {
   display: flex;
   height: 100vh;
-  width: 130vh;
+  width: 100%;
   font-family: Arial, sans-serif;
 }
 
@@ -37,7 +38,7 @@
 .header {
   margin-bottom: 20px;
   display: flex;
-  justify-content: space-between; /* El título a la izquierda y los botones a la derecha */
+  justify-content: space-between; /* Alinea el nombre de la caja a la izquierda y el selector a la derecha */
   align-items: center;
   background-color: transparent; /* Asegura que el header no tenga fondo */
   padding: 0; /* Elimina cualquier padding */
@@ -87,9 +88,12 @@
   box-shadow: none; /* Sin sombra */
 }
 
+
+
 .header h1 {
   font-size: 36px;
   font-weight: bold;
+  margin-left: 100px;
 }
 
 /* Ajustes para las cajas */
@@ -130,4 +134,54 @@
 
 .caja-item select:focus {
   border-color: #007bff;
+}
+
+
+/* Estilo para el formulario de agregar caja */
+.add-box-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9; /* Fondo suave */
+  border: 1px solid #ddd; /* Borde gris claro */
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.add-box-form input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.add-box-form .agregar {
+  padding: 10px 15px;
+  background-color: #28a745; /* Verde */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.add-box-form .cancelar {
+  padding: 10px 15px;
+  background-color: #ff0000; /* Verde */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.add-box-form .agregar:hover {
+  background-color: #218838; /* Verde oscuro en hover */
+}
+
+.add-box-form .cancelar:hover {
+  background-color: #c82333; /* Rojo oscuro en hover */
 }
