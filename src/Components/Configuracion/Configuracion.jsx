@@ -131,8 +131,9 @@ const Configuracion = () => {
           )}
 
           {isAdmin && (
-            <div className="admin-section">
+            <div className="vista-administrador">
               <h2>Vista del Administrador</h2>
+            <div className="admin-section">
               <ul>
                 {usuarios.map((usuario) => (
                   <li key={usuario.LEGAJO}>
@@ -142,13 +143,15 @@ const Configuracion = () => {
                 ))}
               </ul>
             </div>
+          </div>
           )}
 
           {isModalOpen && (
             <div className="modal-overlay" onClick={handleCloseModal}>
               <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2>Permisos del Usuario</h2>
-                {selectedUserPermissions ? (
+                <h3>{selectedUserNick}</h3>
+                {selectedUserPermissions.turnero ? (
                   <ul>
                     <li>Añadir boxes: {selectedUserPermissions.turnero.add_boxes ? 'Si' : 'No'}</li>
                     <li>Añadir motivos de visita: {selectedUserPermissions.turnero.add_motivosvisita ? 'Si' : 'No'}</li>
