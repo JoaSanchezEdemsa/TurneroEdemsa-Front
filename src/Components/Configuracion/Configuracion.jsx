@@ -7,10 +7,12 @@ const Configuracion = () => {
   const navigate = useNavigate();
   const [permisos, setPermisos] = useState(null);
   const [usuarios, setUsuarios] = useState([]);
+  const [sucursales, setSucursales] = useState([]); // Estado para las sucursales
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedUserPermissions, setSelectedUserPermissions] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUserNick, setSelectedUserNick] = useState(null);
+  const [selectedSucursal, setSelectedSucursal] = useState(''); // Estado para la sucursal seleccionada
 
   useEffect(() => {
     if (!(localStorage.getItem('me') > 0)) {
@@ -20,6 +22,7 @@ const Configuracion = () => {
 
   useEffect(() => {
     fetchPermisos();
+    fetchSucursales(); // Llamar a la función para obtener sucursales
   }, []);
 
   const fetchPermisos = async () => {
@@ -74,6 +77,20 @@ const Configuracion = () => {
     }
   };
 
+  const fetchSucursales = async () => {
+    try {
+        const response = await axios.get('http://turnero:8080/getsucursales');
+  
+        // Verifica si la respuesta es un array
+        if (Array.isArray(response.data)) {
+          setSucursales(response.data);
+        } else {
+          console.error('La respuesta no es válida:', response.data);
+        }
+      } catch (error) {
+        console.error('Error al obtener sucursales:', error);
+    };
+  };
 
   const openPermissionsModal = async (usuario) => {
     try {
@@ -133,17 +150,33 @@ const Configuracion = () => {
           {isAdmin && (
             <div className="vista-administrador">
               <h2>Vista del Administrador</h2>
-            <div className="admin-section">
-              <ul>
-                {usuarios.map((usuario) => (
-                  <li key={usuario.LEGAJO}>
-                    {usuario.NOMBRECOMPLETO}
-                    <button className="cambiar-permisos-button" onClick={() => openPermissionsModal(usuario)}>Ver permisos</button>
-                  </li>
-                ))}
-              </ul>
+              <div className="admin-section">
+                <ul>
+                  {usuarios.map((usuario) => (
+                    <li key={usuario.LEGAJO}>
+                      {usuario.NOMBRECOMPLETO}
+                      <button className="cambiar-permisos-button" onClick={() => openPermissionsModal(usuario)}>Ver permisos</button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Dropdown de sucursales */}
+              <div className="sucursales-section">
+                <h3>Seleccionar Sucursal</h3>
+                <select
+                  value={selectedSucursal}
+                  onChange={(e) => setSelectedSucursal(e.target.value)}
+                >
+                  <option value="">Seleccionar una sucursal</option>
+                  {sucursales.map((sucursal) => (
+                    <option key={sucursal.COD_UNICOM} value={sucursal.COD_UNICOM}>
+                      {sucursal.NOM_UNICOM}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
           )}
 
           {isModalOpen && (
