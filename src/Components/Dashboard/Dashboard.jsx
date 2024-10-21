@@ -8,7 +8,7 @@ const Dashboard = () => {
   const [turnos, setTurnos] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTurno, setSelectedTurno] = useState(null);
-  const [llamados, setLlamados] = useState({}); 
+  const [llamados, setLlamados] = useState({});
 
   useEffect(() => {
     if (!(localStorage.getItem("me") > 0)) {
@@ -115,9 +115,24 @@ const Dashboard = () => {
                 <tr key={index}>
                   <td>{turno.hora}</td>
                   <td>{turno.procedencia}</td>
-                  <td>{turno.cliente}</td>
+                  <td>
+                    {turno.cliente ? turno.cliente.split(' ').map((parte, idx) => (
+                      <React.Fragment key={idx}>
+                        {parte}
+                        <br />
+                      </React.Fragment>
+                    )) : '-'}
+                  </td>
                   <td>{turno.motivo}</td>
-                  <td>{turno.NIC ? turno.NIC : '-'}</td>
+                  <td>
+                    {turno.NIC ? turno.NIC.split(',').map((nicPart, idx) => (
+                      <React.Fragment key={idx}>
+                        {nicPart}
+                        <br />
+                      </React.Fragment>
+                    )) : '-'}
+                  </td>
+                  <td>{turno.estado}</td>
                   <td>
                     <div className="action-buttons">
                       <button
