@@ -7,12 +7,11 @@ const Configuracion = () => {
   const navigate = useNavigate();
   const [permisos, setPermisos] = useState(null);
   const [usuarios, setUsuarios] = useState([]);
-  const [sucursales, setSucursales] = useState([]); // Estado para las sucursales
+  const [sucursales, setSucursales] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedUserPermissions, setSelectedUserPermissions] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUserNick, setSelectedUserNick] = useState(null);
-  const [selectedSucursal, setSelectedSucursal] = useState(''); // Estado para la sucursal seleccionada
+  const [selectedSucursal, setSelectedSucursal] = useState('');
 
   useEffect(() => {
     if (!(localStorage.getItem('me') > 0)) {
@@ -22,7 +21,7 @@ const Configuracion = () => {
 
   useEffect(() => {
     fetchPermisos();
-    fetchSucursales(); // Llamar a la función para obtener sucursales
+    fetchSucursales();
   }, []);
 
   const fetchPermisos = async () => {
@@ -79,20 +78,18 @@ const Configuracion = () => {
 
   const fetchSucursales = async () => {
     try {
-        const response = await axios.get('http://turnero:8080/getsucursales');
-  
-        // Verifica si la respuesta es un array
-        if (Array.isArray(response.data)) {
-          setSucursales(response.data);
-        } else {
-          console.error('La respuesta no es válida:', response.data);
-        }
-      } catch (error) {
-        console.error('Error al obtener sucursales:', error);
-    };
+      const response = await axios.get('http://turnero:8080/getsucursales');
+      if (Array.isArray(response.data)) {
+        setSucursales(response.data);
+      } else {
+        console.error('La respuesta no es válida:', response.data);
+      }
+    } catch (error) {
+      console.error('Error al obtener sucursales:', error);
+    }
   };
 
-  const openPermissionsModal = async (usuario) => {
+  const showPermissionsInDiv = async (usuario) => {
     try {
       const response = await axios.get('http://localhost:8080/getpermisosbynick', {
         params: { NICK: usuario.LEGAJO },
@@ -101,7 +98,6 @@ const Configuracion = () => {
       if (response.data) {
         setSelectedUserPermissions(response.data.result);
         setSelectedUserNick(usuario.LEGAJO);
-        setIsModalOpen(true);
         console.log(response.data.result);
       } else {
         console.error('No se encontraron permisos para el usuario seleccionado');
@@ -111,16 +107,11 @@ const Configuracion = () => {
     }
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-  // Función para manejar el cambio de sucursal
   const handleChangeSucursal = () => {
     if (selectedSucursal) {
       localStorage.setItem('sucursal', selectedSucursal);
       console.log(`Sucursal cambiada a: ${selectedSucursal}`);
-      window.location.reload(); // Recargar la página
+      window.location.reload();
     } else {
       console.log('No se ha seleccionado ninguna sucursal.');
     }
@@ -140,32 +131,29 @@ const Configuracion = () => {
         </header>
 
         <div className="configuracion-content">
-
-        {isAdmin && (
-        <div className="sucursales-section">
-                <h3>Seleccionar Sucursal</h3>
-                <select
-                  value={selectedSucursal}
-                  onChange={(e) => setSelectedSucursal(e.target.value)}
-                >
-                  <option value="">Seleccionar una sucursal</option>
-                  {sucursales.map((sucursal) => (
-                    <option key={sucursal.COD_UNICOM} value={sucursal.COD_UNICOM}>
-                      {sucursal.NOM_UNICOM}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Botón para cambiar la sucursal */}
-                <button
-                  className="modal-close-button"
-                  onClick={handleChangeSucursal}
-                  disabled={!selectedSucursal} // Deshabilita el botón si no se ha seleccionado ninguna sucursal
-                >
-                  Cambiar de Sucursal
-                </button>
-              </div>
-            )}
+          {isAdmin && (
+            <div className="sucursales-section">
+              <h3>Seleccionar Sucursal</h3>
+              <select
+                value={selectedSucursal}
+                onChange={(e) => setSelectedSucursal(e.target.value)}
+              >
+                <option value="">Seleccionar una sucursal</option>
+                {sucursales.map((sucursal) => (
+                  <option key={sucursal.COD_UNICOM} value={sucursal.COD_UNICOM}>
+                    {sucursal.NOM_UNICOM}
+                  </option>
+                ))}
+              </select>
+              <button
+                className="modal-close-button"
+                onClick={handleChangeSucursal}
+                disabled={!selectedSucursal}
+              >
+                Cambiar de Sucursal
+              </button>
+            </div>
+          )}
 
           {permisos ? (
             <div className="permisos-section">
@@ -189,51 +177,50 @@ const Configuracion = () => {
           ) : (
             <p>Cargando permisos...</p>
           )}
-
-          {isAdmin && (
-            <div className="vista-administrador">
-              <h2>Vista del Administrador</h2>
-              <div className="admin-section">
-                <ul>
-                  {usuarios.map((usuario) => (
-                    <li key={usuario.LEGAJO}>
-                      {usuario.NOMBRECOMPLETO}
-                      <button className="cambiar-permisos-button" onClick={() => openPermissionsModal(usuario)}>Ver permisos</button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
-
-          {isModalOpen && (
-            <div className="modal-overlay" onClick={handleCloseModal}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <h2>Permisos del Usuario</h2>
-                <h3>{selectedUserNick}</h3>
-                {selectedUserPermissions.turnero ? (
-                  <ul>
-                    <li>Añadir boxes: {selectedUserPermissions.turnero.add_boxes ? 'Si' : 'No'}</li>
-                    <li>Añadir motivos de visita: {selectedUserPermissions.turnero.add_motivosvisita ? 'Si' : 'No'}</li>
-                    <li>Administrar usuarios en boxes: {selectedUserPermissions.turnero.admin_usuarios_x_box ? 'Si' : 'No'}</li>
-                    <li>Eliminar boxes: {selectedUserPermissions.turnero.del_boxes ? 'Si' : 'No'}</li>
-                    <li>Eliminar motivos de visita: {selectedUserPermissions.turnero.del_motivosvisita ? 'Si' : 'No'}</li>
-                    <li>Llamar turno: {selectedUserPermissions.turnero.llamar_turno ? 'Si' : 'No'}</li>
-                    <li>Ver motivos de visita: {selectedUserPermissions.turnero.ver_motivosvisita ? 'Si' : 'No'}</li>
-                    <li>Ver turnos: {selectedUserPermissions.turnero.ver_turnos ? 'Si' : 'No'}</li>
-                  </ul>
-                ) : (
-                  <p>No se encontraron permisos para este usuario.</p>
-                )}
-                <button className="modal-close-button" onClick={handleCloseModal}>
-                  Cerrar
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </main>
+
+      {isAdmin && (
+        <div className="vista-administrador">
+          <h2>Vista del Administrador</h2>
+          <div className="admin-section">
+            <ul>
+              {usuarios.map((usuario) => (
+                <li key={usuario.LEGAJO}>
+                  {usuario.NOMBRECOMPLETO}
+                  <button
+                    className="cambiar-permisos-button"
+                    onClick={() => showPermissionsInDiv(usuario)}
+                  >
+                    Ver permisos
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>  
+      )}
+      <div className='vista-permisos'>
+  <h2>Permisos del Usuario</h2>
+  <h3>{selectedUserNick}</h3><br />
+  {selectedUserPermissions ? (
+    <div className='permisos-usuario'>
+      <p>Añadir boxes: {selectedUserPermissions.turnero.add_boxes ? 'Si' : 'No'}</p>
+      <p>Añadir motivos de visita: {selectedUserPermissions.turnero.add_motivosvisita ? 'Si' : 'No'}</p>
+      <p>Administrar usuarios en boxes: {selectedUserPermissions.turnero.admin_usuarios_x_box ? 'Si' : 'No'}</p>
+      <p>Eliminar boxes: {selectedUserPermissions.turnero.del_boxes ? 'Si' : 'No'}</p>
+      <p>Eliminar motivos de visita: {selectedUserPermissions.turnero.del_motivosvisita ? 'Si' : 'No'}</p>
+      <p>Llamar turno: {selectedUserPermissions.turnero.llamar_turno ? 'Si' : 'No'}</p>
+      <p>Ver motivos de visita: {selectedUserPermissions.turnero.ver_motivosvisita ? 'Si' : 'No'}</p>
+      <p>Ver turnos: {selectedUserPermissions.turnero.ver_turnos ? 'Si' : 'No'}</p>
     </div>
+  ) : (
+    <p>No se encontraron permisos para este usuario.</p>
+  )}
+</div>
+
+    </div>
+    
   );
 };
 
