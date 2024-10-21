@@ -137,15 +137,15 @@
 }
 
 .sidebar-button:hover {
-  background-color: #0056b3; /* Azul más oscuro al pasar el mouse */
-  transform: scale(1.05); /* Animación de agrandamiento */
+  background-color: #0056b3;
+  transform: scale(1.05); 
 }
 
 /* Estilo para el botón activo */
 .sidebar-button.active {
-  background-color: #ff6f61; /* Color especial para el botón activo */
+  background-color: #ff6f61; 
 }
 
 .sidebar-button.active:hover {
-  background-color: #e3554b; /* Color más oscuro cuando el botón activo es hover */
+  background-color: #e3554b; 
 }

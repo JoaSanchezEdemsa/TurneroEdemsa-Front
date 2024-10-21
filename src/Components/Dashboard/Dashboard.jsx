@@ -6,12 +6,14 @@ import axios from 'axios';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [turnos, setTurnos] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
-  const [selectedTurno, setSelectedTurno] = useState(null); // Turno seleccionado
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTurno, setSelectedTurno] = useState(null);
+  const [llamados, setLlamados] = useState({}); 
 
   useEffect(() => {
     if (!(localStorage.getItem("me") > 0)) {
       navigate('/');
+      localStorage.removeItem('llamados');
     }
   }, [navigate]);
 
@@ -23,11 +25,9 @@ const Dashboard = () => {
           console.error('No se encontró la sucursal en el localStorage');
           return;
         }
-
         const response = await axios.get('http://localhost:8080/getturnosbycod', {
           params: { COD_UNICOM: sucursal },
         });
-
         if (response.data && Array.isArray(response.data.result)) {
           setTurnos(response.data.result);
         } else {
@@ -41,6 +41,13 @@ const Dashboard = () => {
     fetchTurnos();
   }, []);
 
+  useEffect(() => {
+    const savedLlamados = localStorage.getItem('llamados');
+    if (savedLlamados) {
+      setLlamados(JSON.parse(savedLlamados));
+    }
+  }, []);
+
   const handleCajasClick = () => {
     navigate('/boxes');
   };
@@ -49,14 +56,26 @@ const Dashboard = () => {
     navigate('/config');
   };
 
+  const handleLlamarClick = (turnoId) => {
+    alert('Se ha llamado al cliente');
+
+    const updatedLlamados = {
+      ...llamados,
+      [turnoId]: true,
+    };
+    setLlamados(updatedLlamados);
+
+    localStorage.setItem('llamados', JSON.stringify(updatedLlamados));
+  };
+
   const handleFinalizarClick = (turno) => {
-    setSelectedTurno(turno); // Guardamos el turno seleccionado
-    setIsModalOpen(true); // Abrimos el modal
+    setSelectedTurno(turno);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setIsModalOpen(false); // Cerramos el modal
-    setSelectedTurno(null); // Limpiamos el turno seleccionado
+    setIsModalOpen(false);
+    setSelectedTurno(null);
   };
 
   return (
@@ -68,7 +87,6 @@ const Dashboard = () => {
           Asignación de empleados
         </button>
       </div>
-
       <main className="content">
         <header className="header">
           <h1>Turnos</h1>
@@ -79,7 +97,6 @@ const Dashboard = () => {
             <button className="status-button">Finalizado</button>
           </div>
         </header>
-
         <div className="empleado-table-container">
           <table className="empleado-table">
             <thead>
@@ -88,7 +105,8 @@ const Dashboard = () => {
                 <th>Procedencia</th>
                 <th>Cliente</th>
                 <th>Motivo</th>
-                <th>ID</th>
+                <th>NIC</th>
+                <th>Estado</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -99,16 +117,23 @@ const Dashboard = () => {
                   <td>{turno.procedencia}</td>
                   <td>{turno.cliente}</td>
                   <td>{turno.motivo}</td>
-                  <td>{turno.id}</td>
+                  <td>{turno.NIC ? turno.NIC : '-'}</td>
                   <td>
                     <div className="action-buttons">
-                      <button className="action-button">Llamar</button>
                       <button
-                        className="action-button action-button-secondary"
-                        onClick={() => handleFinalizarClick(turno)} // Abrir modal con "Finalizar"
+                        className="action-button"
+                        onClick={() => handleLlamarClick(turno.id)}
                       >
-                        Finalizar
+                        Llamar
                       </button>
+                      {llamados[turno.id] && (
+                        <button
+                          className="action-button action-button-secondary"
+                          onClick={() => handleFinalizarClick(turno)}
+                        >
+                          Finalizar
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -123,8 +148,6 @@ const Dashboard = () => {
           <div className="modal-content">
             <h2>Finalizar Turno</h2>
             <p>¿Está seguro de que desea finalizar el turno de {selectedTurno?.cliente}?</p>
-
-            {/* Opciones en vertical */}
             <div className="modal-options">
               <select className="modal-dropdown">
                 <option value="">Seleccione el motivo</option>
@@ -136,7 +159,6 @@ const Dashboard = () => {
               <input type="number" className="modal-input" placeholder="NIC" pattern="\d*" />
             </div>
 
-            {/* Botones en horizontal */}
             <div className="modal-buttons-horizontal">
               <button className="modal-action-button" onClick={closeModal}>
                 Cancelar
