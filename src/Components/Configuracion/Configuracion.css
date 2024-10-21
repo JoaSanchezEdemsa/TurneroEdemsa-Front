@@ -68,6 +68,14 @@
   margin-left: 10px; /* Espacio entre el nombre y el botón */
 }
 
+.modal-close-button{
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
 .cerrar-button {
   background-color: #007bff; /* Color azul similar al botón de salir */
   color: white; /* Texto blanco */
@@ -77,9 +85,13 @@
   cursor: pointer;
   margin-left: 10px; /* Espacio entre el nombre y el botón */
 }
-
 .cambiar-permisos-button:hover, .cerrar-button:hover {
   background-color: #0056b3; /* Color más oscuro al pasar el mouse */
+  
+}
+
+.modal-close-button:hover,.cambiar-permisos-button:hover, .cerrar-button:hover {
+  transform: scale(1.05); 
 }
 
 .modal-overlay {
@@ -103,7 +115,7 @@
 }
 .admin-section {
   margin-top: 20px;
-  max-height: 350px; /* Limita el tamaño del contenido de la lista */
+  max-height: 150px; /* Limita el tamaño del contenido de la lista */
   overflow-y: auto; /* Habilita el scroll vertical */
 }
 
@@ -114,5 +126,14 @@
 
 .admin-section li {
   margin-bottom: 15px; /* Espaciado entre elementos de la lista */
+}
+
+.sucursales-section{
+  display: inline-block;
+  margin-bottom: 30px;
+}
+
+.sucursales-section * { 
+  margin-bottom: 5px; 
 }
 

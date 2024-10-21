@@ -21,7 +21,7 @@
 
 .header-left {
   flex-grow: 1;
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .title {
@@ -35,21 +35,23 @@
 .header-right {
   display: flex;
   align-items: center;
+  height: 82px;
+  margin-right: 5px;
 }
 
 .user-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-right: 15px;
+  margin-right: 10px;
   border: 2px solid #007bff;
 }
 
 .user-name {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 500;
   color: #444; /* Texto un poco más oscuro */
-  margin-right: 25px;
+  margin-right: 20px;
 }
 
 /* Botones del header */
@@ -148,4 +150,9 @@
 
 .sidebar-button.active:hover {
   background-color: #e3554b; 
+}
+
+.sucursal-info {
+  margin-right: 10px;
+  font-weight: bold;
 }

@@ -115,6 +115,17 @@ const Configuracion = () => {
     setIsModalOpen(false);
   };
 
+  // Función para manejar el cambio de sucursal
+  const handleChangeSucursal = () => {
+    if (selectedSucursal) {
+      localStorage.setItem('sucursal', selectedSucursal);
+      console.log(`Sucursal cambiada a: ${selectedSucursal}`);
+      window.location.reload(); // Recargar la página
+    } else {
+      console.log('No se ha seleccionado ninguna sucursal.');
+    }
+  };
+
   return (
     <div className="configuracion-page">
       <aside className="sidebar">
@@ -129,9 +140,37 @@ const Configuracion = () => {
         </header>
 
         <div className="configuracion-content">
+
+        {isAdmin && (
+        <div className="sucursales-section">
+                <h3>Seleccionar Sucursal</h3>
+                <select
+                  value={selectedSucursal}
+                  onChange={(e) => setSelectedSucursal(e.target.value)}
+                >
+                  <option value="">Seleccionar una sucursal</option>
+                  {sucursales.map((sucursal) => (
+                    <option key={sucursal.COD_UNICOM} value={sucursal.COD_UNICOM}>
+                      {sucursal.NOM_UNICOM}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Botón para cambiar la sucursal */}
+                <button
+                  className="modal-close-button"
+                  onClick={handleChangeSucursal}
+                  disabled={!selectedSucursal} // Deshabilita el botón si no se ha seleccionado ninguna sucursal
+                >
+                  Cambiar de Sucursal
+                </button>
+              </div>
+            )}
+
           {permisos ? (
             <div className="permisos-section">
               <h2>Permisos - Turnero</h2>
+              {permisos.turnero ? (
               <ul>
                 <li>Añadir boxes: {permisos.turnero.add_boxes ? 'Si' : 'No'}</li>
                 <li>Añadir motivos de visita: {permisos.turnero.add_motivosvisita ? 'Si' : 'No'}</li>
@@ -142,6 +181,10 @@ const Configuracion = () => {
                 <li>Ver motivos de visita: {permisos.turnero.ver_motivosvisita ? 'Si' : 'No'}</li>
                 <li>Ver turnos: {permisos.turnero.ver_turnos ? 'Si' : 'No'}</li>
               </ul>
+
+            ) : (
+                  <p>No se encontraron permisos para este usuario.</p>
+                )}
             </div>
           ) : (
             <p>Cargando permisos...</p>
@@ -159,22 +202,6 @@ const Configuracion = () => {
                     </li>
                   ))}
                 </ul>
-              </div>
-
-              {/* Dropdown de sucursales */}
-              <div className="sucursales-section">
-                <h3>Seleccionar Sucursal</h3>
-                <select
-                  value={selectedSucursal}
-                  onChange={(e) => setSelectedSucursal(e.target.value)}
-                >
-                  <option value="">Seleccionar una sucursal</option>
-                  {sucursales.map((sucursal) => (
-                    <option key={sucursal.COD_UNICOM} value={sucursal.COD_UNICOM}>
-                      {sucursal.NOM_UNICOM}
-                    </option>
-                  ))}
-                </select>
               </div>
             </div>
           )}
@@ -198,7 +225,9 @@ const Configuracion = () => {
                 ) : (
                   <p>No se encontraron permisos para este usuario.</p>
                 )}
-                <button className="cerrar-button" onClick={handleCloseModal}>Cerrar</button>
+                <button className="modal-close-button" onClick={handleCloseModal}>
+                  Cerrar
+                </button>
               </div>
             </div>
           )}
