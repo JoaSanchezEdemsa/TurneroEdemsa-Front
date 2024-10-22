@@ -26,6 +26,7 @@ const Header = () => {
     localStorage.removeItem('sucursal');
     localStorage.removeItem('usuario');
     localStorage.removeItem('sucursalNombre');
+    localStorage.removeItem('modo_de_renderizado_botones')
     // Recargar la página o redirigir a la página de inicio
     window.location.reload();
   };

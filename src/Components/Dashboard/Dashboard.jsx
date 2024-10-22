@@ -3,6 +3,7 @@ import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaSyncAlt } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -29,9 +30,11 @@ const Dashboard = () => {
       if (response.data && Array.isArray(response.data.result)) {
         const sortedTurnos = sortTurnos(response.data.result);
         setTurnos(sortedTurnos);
+        applyFilter(sortedTurnos);
       } else {
         console.error('No se encontraron turnos para la sucursal');
         setTurnos([]);
+        setFilteredTurnos([]);
       }
     } catch (error) {
       console.error('Error al obtener turnos:', error);
@@ -42,6 +45,9 @@ const Dashboard = () => {
     if (!(localStorage.getItem("me") > 0)) {
       navigate('/');
       localStorage.removeItem('llamados');
+    }
+    if (!localStorage.getItem("modo_de_renderizado_botones")) {
+      localStorage.setItem("modo_de_renderizado_botones", "1"); 
     }
     fetchTurnos();
     refreshTimeoutRef.current = setInterval(fetchTurnos, 180000);
@@ -194,7 +200,6 @@ const Dashboard = () => {
   const applyFilter = (turnos) => {
     const renderMode = localStorage.getItem("modo_de_renderizado_botones");
     let filtered = turnos;
-
     switch (renderMode) {
       case "2": 
         filtered = turnos.filter(t => !t.finalizado_by && !t.finalizado_at && !t.atendido_by && !t.atendido_at);
@@ -209,7 +214,6 @@ const Dashboard = () => {
         filtered = turnos;
         break;
     }
-
     setFilteredTurnos(filtered);
   };
 
