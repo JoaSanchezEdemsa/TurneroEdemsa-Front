@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { FaSyncAlt } from 'react-icons/fa'; // Importa el ícono de recarga
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -10,44 +11,46 @@ const Dashboard = () => {
   const [selectedTurno, setSelectedTurno] = useState(null);
   const [llamados, setLlamados] = useState({});
   const [motivos, setMotivos] = useState([]);
+  const refreshTimeoutRef = useRef(null); // Referencia para el timeout
+
+  const fetchTurnos = async () => {
+    try {
+      const sucursal = localStorage.getItem('sucursal');
+      if (!sucursal) {
+        console.error('No se encontró la sucursal en el localStorage');
+        return;
+      }
+      const response = await axios.get('http://localhost:8080/getturnosbycod', {
+        params: { COD_UNICOM: sucursal },
+      });
+      if (response.data && Array.isArray(response.data.result)) {
+        setTurnos(response.data.result);
+      } else {
+        console.error('No se encontraron turnos para la sucursal');
+        setTurnos([]);
+      }
+    } catch (error) {
+      console.error('Error al obtener turnos:', error);
+    }
+  };
 
   useEffect(() => {
     if (!(localStorage.getItem("me") > 0)) {
       navigate('/');
       localStorage.removeItem('llamados');
     }
+    // Cargamos los turnos inicialmente
+    fetchTurnos();
+
+    // Configuramos el refresco automático cada 3 minutos
+    refreshTimeoutRef.current = setInterval(fetchTurnos, 180000); // 180000 ms = 3 minutos
+
+    return () => clearInterval(refreshTimeoutRef.current); // Limpiamos el intervalo al desmontar el componente
   }, [navigate]);
 
-  useEffect(() => {
-    const fetchTurnos = async () => {
-      try {
-        const sucursal = localStorage.getItem('sucursal');
-        if (!sucursal) {
-          console.error('No se encontró la sucursal en el localStorage');
-          return;
-        }
-        const response = await axios.get('http://localhost:8080/getturnosbycod', {
-          params: { COD_UNICOM: sucursal },
-        });
-        if (response.data && Array.isArray(response.data.result)) {
-          setTurnos(response.data.result);
-        } else {
-          console.error('No se encontraron turnos para la sucursal');
-          setTurnos([]);
-        }
-      } catch (error) {
-        console.error('Error al obtener turnos:', error);
-      }
-    };
-    fetchTurnos();
-  }, []);
-
-  useEffect(() => {
-    const savedLlamados = localStorage.getItem('llamados');
-    if (savedLlamados) {
-      setLlamados(JSON.parse(savedLlamados));
-    }
-  }, []);
+  const handleReloadClick = () => {
+    fetchTurnos(); // Recargar los turnos manualmente
+  };
 
   const handleCajasClick = () => {
     navigate('/boxes');
@@ -59,12 +62,10 @@ const Dashboard = () => {
 
   const handleLlamarClick = async (turnoId) => {
     const nick = localStorage.getItem('me');
-
     if (!nick) {
       console.error('No se encontró el nick en el localStorage');
       return;
     }
-
     try {
       const response = await axios.post('http://localhost:8080/getstatusturno', {
         id: turnoId,
@@ -107,7 +108,6 @@ const Dashboard = () => {
     fetchMotivos();
   };
 
-
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedTurno(null);
@@ -124,12 +124,13 @@ const Dashboard = () => {
       </div>
       <main className="content">
         <header className="header">
-          <h1>Turnos</h1>
-          <div className="status-buttons">
-            <button className='status-button' title='Mostrar todos los turnos'>Todos</button>
-            <button className="status-button" title='Mostrar los turnos pendientes'>Pendiente</button>
-            <button className="status-button">En Curso</button>
-            <button className="status-button">Finalizado</button>
+            <h1>Turnos</h1>
+            <FaSyncAlt className="reload-icon" onClick={handleReloadClick} title="Recargar" /> 
+          <div className="button-group">
+            <button onClick={handleConfigClick} className="header-button">Configuración</button>
+            <button onClick={handleCajasClick} className="header-button">Cajas</button>
+            <button onClick={() => navigate('/somePage')} className="header-button">Turnos</button>
+            <button onClick={() => navigate('/anotherPage')} className="header-button">Otros</button>
           </div>
         </header>
         <div className="empleado-table-container">
@@ -153,8 +154,6 @@ const Dashboard = () => {
                     <br />
                     {turno.motivo ? turno.motivo : '-'}
                   </td>
-
-
                   <td>{turno.procedencia}</td>
                   <td>
                     {turno.NIC ? turno.NIC.split(',').map((nicPart, idx) => (
@@ -220,4 +219,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
