@@ -27,7 +27,8 @@ const Dashboard = () => {
         params: { COD_UNICOM: sucursal },
       });
       if (response.data && Array.isArray(response.data.result)) {
-        setTurnos(response.data.result);
+        const sortedTurnos = sortTurnos(response.data.result);
+        setTurnos(sortedTurnos);
       } else {
         console.error('No se encontraron turnos para la sucursal');
         setTurnos([]);
@@ -85,6 +86,7 @@ const Dashboard = () => {
 
       if (response.data) {
         alert('Se ha llamado al cliente');
+        handleReloadClick();
       }
 
       const updatedLlamados = {
@@ -134,7 +136,7 @@ const Dashboard = () => {
       });
 
       if (response.data) {
-        alert('El turno ha sido finalizado exitosamente');
+        handleReloadClick();
         closeModal();
       }
     } catch (error) {
@@ -154,6 +156,43 @@ const Dashboard = () => {
     setSelectedTurno(null);
   };
 
+  // Lógica de validación para los botones "Llamar" y "Finalizar"
+  const isTurnoCompletado = (turno) => {
+    return turno.atendido_by && turno.atendido_at && turno.finalizado_by && turno.finalizado_at;
+  };
+
+  const isTurnoAtendidoPeroNoFinalizado = (turno) => {
+    return turno.atendido_by && turno.atendido_at && !turno.finalizado_by && !turno.finalizado_at;
+  };
+
+  const sortTurnos = (turnos) => {
+    return turnos
+    .sort((a, b) => {
+      if (a.estado === 'finalizado' && b.estado !== 'finalizado') {
+        return 1;
+      } else if (a.estado !== 'finalizado' && b.estado === 'finalizado') {
+        return -1;
+      }
+        const formatter = new Intl.DateTimeFormat('es-AR', {
+          hour: 'numeric', 
+          minute: 'numeric', 
+          timeZone: 'America/Argentina/Mendoza',
+          hour12: false
+        });
+  
+        const parseTime = (hora) => {
+          const [hours, minutes] = hora.split(':');
+          return new Date(1970, 0, 1, hours, minutes);
+        };
+  
+        const horaA = parseTime(a.hora);
+        const horaB = parseTime(b.hora);
+  
+        return horaA - horaB;
+      });
+  };
+  
+
   return (
     <div className="dashboard-page">
       <div className="sidebar">
@@ -168,10 +207,10 @@ const Dashboard = () => {
           <h1>Turnos</h1>
           <FaSyncAlt className="reload-icon" onClick={handleReloadClick} title="Recargar" />
           <div className="button-group">
-            <button className="header-button">Todos</button>
-            <button className="header-button">Pendientes</button>
-            <button className="header-button">En curso</button>
-            <button className="header-button">Finalizados</button>
+            <button className="header-button" onClick={handleReloadClick}>Todos</button>
+            <button className="header-button" onClick={handleReloadClick}>Pendientes</button>
+            <button className="header-button" onClick={handleReloadClick}>En curso</button>
+            <button className="header-button" onClick={handleReloadClick}>Finalizados</button>
           </div>
         </header>
         <div className="empleado-table-container">
@@ -207,19 +246,42 @@ const Dashboard = () => {
                   <td>{turno.estado}</td>
                   <td>
                     <div className="action-buttons">
-                      <button
-                        className="action-button"
-                        onClick={() => handleLlamarClick(turno.id)}
-                      >
-                        Llamar
-                      </button>
-                      {llamados[turno.id] && (
-                        <button
-                          className="action-button action-button-secondary"
-                          onClick={() => handleFinalizarClick(turno)}
-                        >
-                          Finalizar
-                        </button>
+                      {isTurnoCompletado(turno) ? (
+                        <>
+                          <span>-</span>
+                        </>
+                      ) : isTurnoAtendidoPeroNoFinalizado(turno) ? (
+                        <>
+                          <button
+                            className="action-button"
+                            onClick={() => handleLlamarClick(turno.id)}
+                          >
+                            Llamar
+                          </button>
+                          <button
+                            className="action-button action-button-secondary"
+                            onClick={() => handleFinalizarClick(turno)}
+                          >
+                            Finalizar
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            className="action-button"
+                            onClick={() => handleLlamarClick(turno.id)}
+                          >
+                            Llamar
+                          </button>
+                          {llamados[turno.id] && (
+                            <button
+                              className="action-button action-button-secondary"
+                              onClick={() => handleFinalizarClick(turno)}
+                            >
+                              Finalizar
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   </td>
@@ -245,12 +307,19 @@ const Dashboard = () => {
               <textarea className="modal-input" placeholder="Descripción" rows="3" required></textarea>
               <input type="number" className="modal-input" placeholder="NIC" value={nicValue} onChange={handleNicChange} pattern="\d*" required />
             </div>
-
             <div className="modal-buttons-horizontal">
-              <button className="modal-action-button" onClick={closeModal}>
+              <button className="modal-action-button" onClick={() => {
+                handleReloadClick();
+                closeModal();
+              }}>
                 Cancelar
               </button>
-              <button className="modal-action-button" onClick={handleConfirmarClick}>Confirmar</button>
+              <button className="modal-action-button" onClick={() => {
+                handleReloadClick();
+                handleConfirmarClick();
+              }}>
+                Confirmar
+              </button>
             </div>
           </div>
         </div>
