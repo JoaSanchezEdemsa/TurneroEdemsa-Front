@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaSyncAlt } from 'react-icons/fa'; // Importa el ícono de recarga
+import { FaSyncAlt } from 'react-icons/fa';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -11,7 +11,10 @@ const Dashboard = () => {
   const [selectedTurno, setSelectedTurno] = useState(null);
   const [llamados, setLlamados] = useState({});
   const [motivos, setMotivos] = useState([]);
-  const refreshTimeoutRef = useRef(null); // Referencia para el timeout
+  const [selectedMotivo, setSelectedMotivo] = useState('');
+  const [nicValue, setNicValue] = useState('');
+  const refreshTimeoutRef = useRef(null);
+
 
   const fetchTurnos = async () => {
     try {
@@ -39,17 +42,13 @@ const Dashboard = () => {
       navigate('/');
       localStorage.removeItem('llamados');
     }
-    // Cargamos los turnos inicialmente
     fetchTurnos();
-
-    // Configuramos el refresco automático cada 3 minutos
-    refreshTimeoutRef.current = setInterval(fetchTurnos, 180000); // 180000 ms = 3 minutos
-
-    return () => clearInterval(refreshTimeoutRef.current); // Limpiamos el intervalo al desmontar el componente
+    refreshTimeoutRef.current = setInterval(fetchTurnos, 180000);
+    return () => clearInterval(refreshTimeoutRef.current);
   }, [navigate]);
 
   const handleReloadClick = () => {
-    fetchTurnos(); // Recargar los turnos manualmente
+    fetchTurnos();
   };
 
   const handleCajasClick = () => {
@@ -58,6 +57,14 @@ const Dashboard = () => {
 
   const handleConfigClick = () => {
     navigate('/config');
+  };
+
+  const handleMotivoChange = (event) => {
+    setSelectedMotivo(event.target.value);
+  };
+
+  const handleNicChange = (event) => {
+    setNicValue(event.target.value);
   };
 
   const handleLlamarClick = async (turnoId) => {
@@ -102,6 +109,40 @@ const Dashboard = () => {
     }
   };
 
+  const handleConfirmarClick = async () => {
+    const nick = localStorage.getItem('me');
+    if (!nick) {
+      console.error('No se encontró el nick en el localStorage');
+      return;
+    }
+
+    if (!selectedMotivo || !nicValue) {
+      alert('Debe seleccionar un motivo y llenar el NIC.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:8080/getstatusturnofinalizado', {
+        id: selectedTurno.id,
+        NICK: nick,
+        NIC: nicValue,
+        CODIGO: selectedMotivo
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.data) {
+        alert('El turno ha sido finalizado exitosamente');
+        closeModal();
+      }
+    } catch (error) {
+      console.error('Error al finalizar el turno:', error);
+    }
+  };
+
+
   const handleFinalizarClick = (turno) => {
     setSelectedTurno(turno);
     setIsModalOpen(true);
@@ -124,8 +165,8 @@ const Dashboard = () => {
       </div>
       <main className="content">
         <header className="header">
-            <h1>Turnos</h1>
-            <FaSyncAlt className="reload-icon" onClick={handleReloadClick} title="Recargar" /> 
+          <h1>Turnos</h1>
+          <FaSyncAlt className="reload-icon" onClick={handleReloadClick} title="Recargar" />
           <div className="button-group">
             <button className="header-button">Todos</button>
             <button className="header-button">Pendientes</button>
@@ -195,25 +236,26 @@ const Dashboard = () => {
             <h2>Finalizar Turno</h2>
             <p>¿Está seguro de que desea finalizar el turno de {selectedTurno?.cliente}?</p>
             <div className="modal-options">
-              <select className="modal-dropdown">
+              <select className="modal-dropdown" value={selectedMotivo} onChange={handleMotivoChange}>
                 <option value="" required>Seleccione el motivo</option>
                 {motivos.map((motivo, index) => (
                   <option key={index} value={motivo.CODIGO}>{motivo.MOTIVO}</option>
                 ))}
               </select>
               <textarea className="modal-input" placeholder="Descripción" rows="3" required></textarea>
-              <input type="number" className="modal-input" placeholder="NIC" pattern="\d*" required/>
+              <input type="number" className="modal-input" placeholder="NIC" value={nicValue} onChange={handleNicChange} pattern="\d*" required />
             </div>
 
             <div className="modal-buttons-horizontal">
               <button className="modal-action-button" onClick={closeModal}>
                 Cancelar
               </button>
-              <button className="modal-action-button">Confirmar</button>
+              <button className="modal-action-button" onClick={handleConfirmarClick}>Confirmar</button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 };
