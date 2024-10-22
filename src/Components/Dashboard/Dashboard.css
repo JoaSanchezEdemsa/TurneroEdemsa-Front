@@ -257,3 +257,11 @@ input[type="number"]::-webkit-outer-spin-button {
 .header-button:hover {
   background-color: #0056b3;
 }
+
+.turno-row.pendiente {
+  font-weight: bold;
+}
+
+.turno-row.finalizado {
+  color: grey;
+}

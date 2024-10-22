@@ -13,8 +13,8 @@ const Dashboard = () => {
   const [motivos, setMotivos] = useState([]);
   const [selectedMotivo, setSelectedMotivo] = useState('');
   const [nicValue, setNicValue] = useState('');
+  const [filteredTurnos, setFilteredTurnos] = useState([]);
   const refreshTimeoutRef = useRef(null);
-
 
   const fetchTurnos = async () => {
     try {
@@ -117,12 +117,12 @@ const Dashboard = () => {
       console.error('No se encontró el nick en el localStorage');
       return;
     }
-
+  
     if (!selectedMotivo || !nicValue) {
       alert('Debe seleccionar un motivo y llenar el NIC.');
       return;
     }
-
+  
     try {
       const response = await axios.post('http://localhost:8080/getstatusturnofinalizado', {
         id: selectedTurno.id,
@@ -134,17 +134,17 @@ const Dashboard = () => {
           'Content-Type': 'application/json',
         },
       });
-
       if (response.data) {
         handleReloadClick();
+        setSelectedMotivo('');
+        setNicValue('');
         closeModal();
       }
     } catch (error) {
       console.error('Error al finalizar el turno:', error);
     }
   };
-
-
+  
   const handleFinalizarClick = (turno) => {
     setSelectedTurno(turno);
     setIsModalOpen(true);
@@ -156,7 +156,6 @@ const Dashboard = () => {
     setSelectedTurno(null);
   };
 
-  // Lógica de validación para los botones "Llamar" y "Finalizar"
   const isTurnoCompletado = (turno) => {
     return turno.atendido_by && turno.atendido_at && turno.finalizado_by && turno.finalizado_at;
   };
@@ -167,31 +166,82 @@ const Dashboard = () => {
 
   const sortTurnos = (turnos) => {
     return turnos
-    .sort((a, b) => {
-      if (a.estado === 'finalizado' && b.estado !== 'finalizado') {
-        return 1;
-      } else if (a.estado !== 'finalizado' && b.estado === 'finalizado') {
-        return -1;
-      }
-        const formatter = new Intl.DateTimeFormat('es-AR', {
-          hour: 'numeric', 
-          minute: 'numeric', 
+      .sort((a, b) => {
+        if (a.estado === 'finalizado' && b.estado !== 'finalizado') {
+          return 1;
+        } else if (a.estado !== 'finalizado' && b.estado === 'finalizado') {
+          return -1;
+        }
+        const formatter = new Intl.DateTimeFormat('es-AR', {          //EL FORMATTER SI LO ESTÁ USANDO, ES UN BUG//
+          hour: 'numeric',
+          minute: 'numeric',
           timeZone: 'America/Argentina/Mendoza',
           hour12: false
         });
-  
+
         const parseTime = (hora) => {
           const [hours, minutes] = hora.split(':');
           return new Date(1970, 0, 1, hours, minutes);
         };
-  
+
         const horaA = parseTime(a.hora);
         const horaB = parseTime(b.hora);
-  
+
         return horaA - horaB;
       });
   };
-  
+
+  const applyFilter = (turnos) => {
+    const renderMode = localStorage.getItem("modo_de_renderizado_botones");
+    let filtered = turnos;
+
+    switch (renderMode) {
+      case "2": 
+        filtered = turnos.filter(t => !t.finalizado_by && !t.finalizado_at && !t.atendido_by && !t.atendido_at);
+        break;
+      case "3": 
+        filtered = turnos.filter(t => !t.finalizado_by && !t.finalizado_at && t.atendido_by && t.atendido_at);
+        break;
+      case "4": 
+        filtered = turnos.filter(t => t.finalizado_by && t.finalizado_at && t.atendido_by && t.atendido_at);
+        break;
+      default: 
+        filtered = turnos;
+        break;
+    }
+
+    setFilteredTurnos(filtered);
+  };
+
+  const handleTodosClick = () => {
+    localStorage.setItem("modo_de_renderizado_botones", "1");
+    applyFilter(turnos);
+  };
+
+  const handlePendientesClick = () => {
+    localStorage.setItem("modo_de_renderizado_botones", "2");
+    applyFilter(turnos);
+  };
+
+  const handleEnCursoClick = () => {
+    localStorage.setItem("modo_de_renderizado_botones", "3");
+    applyFilter(turnos);
+  };
+
+  const handleFinalizadosClick = () => {
+    localStorage.setItem("modo_de_renderizado_botones", "4");
+    applyFilter(turnos);
+  };
+
+  const getRowStyle = (turno) => {
+    if (turno.finalizado_by && turno.finalizado_at) {
+      return { color: 'grey' }; 
+    }
+    if (!turno.finalizado_by && !turno.finalizado_at && !turno.atendido_by && !turno.atendido_at) {
+      return { fontWeight: 'bold' }; 
+    }
+    return {}; 
+  };
 
   return (
     <div className="dashboard-page">
@@ -207,10 +257,10 @@ const Dashboard = () => {
           <h1>Turnos</h1>
           <FaSyncAlt className="reload-icon" onClick={handleReloadClick} title="Recargar" />
           <div className="button-group">
-            <button className="header-button" onClick={handleReloadClick}>Todos</button>
-            <button className="header-button" onClick={handleReloadClick}>Pendientes</button>
-            <button className="header-button" onClick={handleReloadClick}>En curso</button>
-            <button className="header-button" onClick={handleReloadClick}>Finalizados</button>
+          <button className="header-button" onClick={handleTodosClick}>Todos</button>
+          <button className="header-button" onClick={handlePendientesClick}>Pendientes</button>
+          <button className="header-button" onClick={handleEnCursoClick}>En curso</button>
+          <button className="header-button" onClick={handleFinalizadosClick}>Finalizados</button>
           </div>
         </header>
         <div className="empleado-table-container">
@@ -226,24 +276,24 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {turnos.map((turno, index) => (
-                <tr key={index}>
-                  <td>{turno.hora}</td>
-                  <td>
-                    {turno.cliente}
-                    <br />
-                    {turno.motivo ? turno.motivo : '-'}
-                  </td>
-                  <td>{turno.procedencia}</td>
-                  <td>
-                    {turno.NIC ? turno.NIC.split(',').map((nicPart, idx) => (
-                      <React.Fragment key={idx}>
-                        {nicPart}
-                        <br />
-                      </React.Fragment>
-                    )) : '-'}
-                  </td>
-                  <td>{turno.estado}</td>
+            {filteredTurnos.map((turno, index) => (
+              <tr key={index} style={getRowStyle(turno)}>
+                <td>{turno.hora}</td>
+                <td>
+                  {turno.cliente}
+                  <br />
+                  {turno.motivo ? turno.motivo : '-'}
+                </td>
+                <td>{turno.procedencia}</td>
+                <td>
+                  {turno.NIC ? turno.NIC.split(',').map((nicPart, idx) => (
+                    <React.Fragment key={idx}>
+                      {nicPart}
+                      <br />
+                    </React.Fragment>
+                  )) : '-'}
+                </td>
+                <td>{turno.estado}</td>
                   <td>
                     <div className="action-buttons">
                       {isTurnoCompletado(turno) ? (
@@ -291,7 +341,6 @@ const Dashboard = () => {
           </table>
         </div>
       </main>
-
       {isModalOpen && (
         <div className="modal">
           <div className="modal-content">
@@ -324,7 +373,6 @@ const Dashboard = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };
