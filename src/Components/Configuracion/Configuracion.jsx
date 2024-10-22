@@ -200,24 +200,28 @@ const Configuracion = () => {
           </div>
         </div>  
       )}
+
+    {isAdmin && (
       <div className='vista-permisos'>
-  <h2>Permisos del Usuario</h2>
-  <h3>{selectedUserNick}</h3><br />
-  {selectedUserPermissions ? (
-    <div className='permisos-usuario'>
-      <p>Añadir boxes: {selectedUserPermissions.turnero.add_boxes ? 'Si' : 'No'}</p>
-      <p>Añadir motivos de visita: {selectedUserPermissions.turnero.add_motivosvisita ? 'Si' : 'No'}</p>
-      <p>Administrar usuarios en boxes: {selectedUserPermissions.turnero.admin_usuarios_x_box ? 'Si' : 'No'}</p>
-      <p>Eliminar boxes: {selectedUserPermissions.turnero.del_boxes ? 'Si' : 'No'}</p>
-      <p>Eliminar motivos de visita: {selectedUserPermissions.turnero.del_motivosvisita ? 'Si' : 'No'}</p>
-      <p>Llamar turno: {selectedUserPermissions.turnero.llamar_turno ? 'Si' : 'No'}</p>
-      <p>Ver motivos de visita: {selectedUserPermissions.turnero.ver_motivosvisita ? 'Si' : 'No'}</p>
-      <p>Ver turnos: {selectedUserPermissions.turnero.ver_turnos ? 'Si' : 'No'}</p>
-    </div>
-  ) : (
-    <p>No se encontraron permisos para este usuario.</p>
-  )}
-</div>
+          <h2>Permisos del Usuario</h2>
+          <h3>{selectedUserNick}</h3><br />
+          {selectedUserPermissions && selectedUserPermissions.turnero? (
+            <div className='permisos-usuario'>
+              <p>Añadir boxes: {selectedUserPermissions.turnero.add_boxes ? 'Si' : 'No'}</p>
+              <p>Añadir motivos de visita: {selectedUserPermissions.turnero.add_motivosvisita ? 'Si' : 'No'}</p>
+              <p>Administrar usuarios en boxes: {selectedUserPermissions.turnero.admin_usuarios_x_box ? 'Si' : 'No'}</p>
+              <p>Eliminar boxes: {selectedUserPermissions.turnero.del_boxes ? 'Si' : 'No'}</p>
+              <p>Eliminar motivos de visita: {selectedUserPermissions.turnero.del_motivosvisita ? 'Si' : 'No'}</p>
+              <p>Llamar turno: {selectedUserPermissions.turnero.llamar_turno ? 'Si' : 'No'}</p>
+              <p>Ver motivos de visita: {selectedUserPermissions.turnero.ver_motivosvisita ? 'Si' : 'No'}</p>
+              <p>Ver turnos: {selectedUserPermissions.turnero.ver_turnos ? 'Si' : 'No'}</p>
+            </div>
+          ) : (
+            <p>No se encontraron permisos para este usuario.</p>
+          )}
+        </div>
+
+        )}
 
     </div>
     
