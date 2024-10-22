@@ -127,10 +127,10 @@ const Dashboard = () => {
             <h1>Turnos</h1>
             <FaSyncAlt className="reload-icon" onClick={handleReloadClick} title="Recargar" /> 
           <div className="button-group">
-            <button onClick={handleConfigClick} className="header-button">Configuración</button>
-            <button onClick={handleCajasClick} className="header-button">Cajas</button>
-            <button onClick={() => navigate('/somePage')} className="header-button">Turnos</button>
-            <button onClick={() => navigate('/anotherPage')} className="header-button">Otros</button>
+            <button className="header-button">Todos</button>
+            <button className="header-button">Pendientes</button>
+            <button className="header-button">En curso</button>
+            <button className="header-button">Finalizados</button>
           </div>
         </header>
         <div className="empleado-table-container">
