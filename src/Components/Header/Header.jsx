@@ -8,13 +8,13 @@ const Header = () => {
 
   useEffect(() => {
     // Obtener el nombre del usuario desde localStorage
-    const user = localStorage.getItem('me');
+    const user = localStorage.getItem('usuario');
     if (user) {
       setUserName(user); // Guardamos el nombre del usuario en el estado
     }
 
     // Obtener la sucursal actual desde localStorage
-    const sucursal = localStorage.getItem('sucursal');
+    const sucursal = localStorage.getItem('sucursalNombre');
     if (sucursal) {
       setCurrentSucursal(sucursal); // Guardamos la sucursal en el estado
     }
@@ -24,6 +24,8 @@ const Header = () => {
     // Eliminar los items de localStorage
     localStorage.removeItem('me');
     localStorage.removeItem('sucursal');
+    localStorage.removeItem('usuario');
+    localStorage.removeItem('sucursalNombre');
     // Recargar la página o redirigir a la página de inicio
     window.location.reload();
   };

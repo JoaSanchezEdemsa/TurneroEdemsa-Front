@@ -28,11 +28,14 @@ const LoginWithToken = () => {
         }
                 
         localStorage.setItem('me', response.data.result.nick); // Almacenar en el localStorage
+        localStorage.setItem('usuario', response.data.result.USUARIO);
 
         // Verifica si el objeto 'response.data.result' tiene datos válidos
       if (response.data.result && response.data.result.usuarioOPEN) {
           // Si el objeto tiene el atributo COD_UNICOM, lo almacenas en localStorage
           localStorage.setItem('sucursal', response.data.result.usuarioOPEN.COD_UNICOM);
+          localStorage.setItem('sucursalNombre', response.data.result.usuarioOPEN.NOM_UNICOM);
+
         } else {
               localStorage.setItem('sucursal', null); // Almacena un valor por defecto si no hay datos
         }

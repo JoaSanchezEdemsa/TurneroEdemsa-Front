@@ -12,6 +12,7 @@ const Configuracion = () => {
   const [selectedUserPermissions, setSelectedUserPermissions] = useState(null);
   const [selectedUserNick, setSelectedUserNick] = useState(null);
   const [selectedSucursal, setSelectedSucursal] = useState('');
+  const [selectedUser, setSelectedUser] = useState('');
 
   useEffect(() => {
     if (!(localStorage.getItem('me') > 0)) {
@@ -109,12 +110,22 @@ const Configuracion = () => {
 
   const handleChangeSucursal = () => {
     if (selectedSucursal) {
-      localStorage.setItem('sucursal', selectedSucursal);
-      console.log(`Sucursal cambiada a: ${selectedSucursal}`);
-      window.location.reload();
+      const sucursalSeleccionada = sucursales.find(s => s.NOM_UNICOM === selectedSucursal);
+      if (sucursalSeleccionada) {
+        localStorage.setItem('sucursalNombre', sucursalSeleccionada.NOM_UNICOM);  // Guardar nombre
+        localStorage.setItem('sucursal', sucursalSeleccionada.COD_UNICOM);  // Guardar código
+        console.log(`Sucursal cambiada a: ${sucursalSeleccionada.NOM_UNICOM} (${sucursalSeleccionada.COD_UNICOM})`);
+        window.location.reload();
+      }
     } else {
       console.log('No se ha seleccionado ninguna sucursal.');
     }
+  };
+
+  const handleUserChange = (event) => {
+    const selectedLegajo = event.target.value;
+    const selectedUsuario = usuarios.find((usuario) => usuario.LEGAJO === selectedLegajo);
+    setSelectedUser(selectedUsuario);
   };
 
   return (
@@ -135,16 +146,16 @@ const Configuracion = () => {
             <div className="sucursales-section">
               <h3>Seleccionar Sucursal</h3>
               <select
-                value={selectedSucursal}
-                onChange={(e) => setSelectedSucursal(e.target.value)}
-              >
-                <option value="">Seleccionar una sucursal</option>
-                {sucursales.map((sucursal) => (
-                  <option key={sucursal.COD_UNICOM} value={sucursal.COD_UNICOM}>
-                    {sucursal.NOM_UNICOM}
-                  </option>
-                ))}
-              </select>
+                  value={selectedSucursal}
+                  onChange={(e) => setSelectedSucursal(e.target.value)}  // Ya estaba correcto
+                >
+                  <option value="">Seleccionar una sucursal</option>
+                  {sucursales.map((sucursal) => (
+                    <option key={sucursal.COD_UNICOM} value={sucursal.NOM_UNICOM}>
+                      {sucursal.NOM_UNICOM}
+                    </option>
+                  ))}
+                </select>
               <button
                 className="modal-close-button"
                 onClick={handleChangeSucursal}
@@ -159,20 +170,19 @@ const Configuracion = () => {
             <div className="permisos-section">
               <h2>Permisos - Turnero</h2>
               {permisos.turnero ? (
-              <ul>
-                <li>Añadir boxes: {permisos.turnero.add_boxes ? 'Si' : 'No'}</li>
-                <li>Añadir motivos de visita: {permisos.turnero.add_motivosvisita ? 'Si' : 'No'}</li>
-                <li>Administrar usuarios en boxes: {permisos.turnero.admin_usuarios_x_box ? 'Si' : 'No'}</li>
-                <li>Eliminar boxes: {permisos.turnero.del_boxes ? 'Si' : 'No'}</li>
-                <li>Eliminar motivos de visita: {permisos.turnero.del_motivosvisita ? 'Si' : 'No'}</li>
-                <li>Llamar turno: {permisos.turnero.llamar_turno ? 'Si' : 'No'}</li>
-                <li>Ver motivos de visita: {permisos.turnero.ver_motivosvisita ? 'Si' : 'No'}</li>
-                <li>Ver turnos: {permisos.turnero.ver_turnos ? 'Si' : 'No'}</li>
-              </ul>
-
-            ) : (
-                  <p>No se encontraron permisos para este usuario.</p>
-                )}
+                <ul>
+                  <li>Añadir boxes: {permisos.turnero.add_boxes ? 'Si' : 'No'}</li>
+                  <li>Añadir motivos de visita: {permisos.turnero.add_motivosvisita ? 'Si' : 'No'}</li>
+                  <li>Administrar usuarios en boxes: {permisos.turnero.admin_usuarios_x_box ? 'Si' : 'No'}</li>
+                  <li>Eliminar boxes: {permisos.turnero.del_boxes ? 'Si' : 'No'}</li>
+                  <li>Eliminar motivos de visita: {permisos.turnero.del_motivosvisita ? 'Si' : 'No'}</li>
+                  <li>Llamar turno: {permisos.turnero.llamar_turno ? 'Si' : 'No'}</li>
+                  <li>Ver motivos de visita: {permisos.turnero.ver_motivosvisita ? 'Si' : 'No'}</li>
+                  <li>Ver turnos: {permisos.turnero.ver_turnos ? 'Si' : 'No'}</li>
+                </ul>
+              ) : (
+                <p>No se encontraron permisos para este usuario.</p>
+              )}
             </div>
           ) : (
             <p>Cargando permisos...</p>
@@ -184,29 +194,32 @@ const Configuracion = () => {
         <div className="vista-administrador">
           <h2>Vista del Administrador</h2>
           <div className="admin-section">
-            <ul>
+            <h3>Seleccionar Usuario</h3>
+            <select value={selectedUser?.LEGAJO || ''} onChange={handleUserChange}>
+              <option value="">Seleccionar un empleado</option>
               {usuarios.map((usuario) => (
-                <li key={usuario.LEGAJO}>
+                <option key={usuario.LEGAJO} value={usuario.LEGAJO}>
                   {usuario.NOMBRECOMPLETO}
-                  <button
-                    className="cambiar-permisos-button"
-                    onClick={() => showPermissionsInDiv(usuario)}
-                  >
-                    Ver permisos
-                  </button>
-                </li>
+                </option>
               ))}
-            </ul>
+            </select>
+            <button
+              className="cambiar-permisos-button"
+              onClick={() => showPermissionsInDiv(selectedUser)}
+              disabled={!selectedUser}
+            >
+              Ver Permisos
+            </button>
           </div>
-        </div>  
+        </div>
       )}
 
-    {isAdmin && (
-      <div className='vista-permisos'>
+      {isAdmin && (
+        <div className="vista-permisos">
           <h2>Permisos del Usuario</h2>
-          <h3>{selectedUserNick}</h3><br />
-          {selectedUserPermissions && selectedUserPermissions.turnero? (
-            <div className='permisos-usuario'>
+          <h3>{selectedUserNick || 'Seleccione un usuario para ver sus permisos'}</h3>
+          {selectedUserPermissions && selectedUserPermissions.turnero ? (
+            <div className="permisos-usuario">
               <p>Añadir boxes: {selectedUserPermissions.turnero.add_boxes ? 'Si' : 'No'}</p>
               <p>Añadir motivos de visita: {selectedUserPermissions.turnero.add_motivosvisita ? 'Si' : 'No'}</p>
               <p>Administrar usuarios en boxes: {selectedUserPermissions.turnero.admin_usuarios_x_box ? 'Si' : 'No'}</p>
@@ -220,11 +233,8 @@ const Configuracion = () => {
             <p>No se encontraron permisos para este usuario.</p>
           )}
         </div>
-
-        )}
-
+      )}
     </div>
-    
   );
 };
 
