@@ -4,6 +4,7 @@ import './CajaEmpleados.css';
 import { useNavigate } from 'react-router-dom';
 
 const CajaEmpleados = () => {
+  const [permisos, setPermisos] = useState({});
   const [cajas, setCajas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [selectedBoxes, setSelectedBoxes] = useState({});
@@ -17,6 +18,36 @@ const CajaEmpleados = () => {
       navigate('/');
     }
   }, [navigate]);
+
+  useEffect(() => {
+    fetchPermisos();
+  }, []);
+
+  const fetchPermisos = async () => {
+    try {
+      const nick = localStorage.getItem('me');
+      if (!nick) {
+        console.error('No se encontró el nick en el localStorage');
+        return;
+      }
+
+      const response = await axios.get('http://localhost:8080/getpermisosbynick', {
+        params: { NICK: nick },
+      });
+
+      if (response.data) {
+        setPermisos(response.data.result);
+        console.log(response.data.result)
+      } else {
+        console.error('No se encontraron permisos con ese nick');
+        setPermisos(null);
+      }
+    } catch (error) {
+      console.error('Error al obtener permisos:', error);
+    }
+  };
+
+  
 
   useEffect(() => {
     const fetchCajas = async () => {
@@ -145,12 +176,26 @@ const CajaEmpleados = () => {
       <main className="content">
         <header className="header">
           <h1>Cajas</h1>
+          {permisos.turnero ? (
           <div className="button-container">
-            <button onClick={handleAddBoxClick} className="add-box-button">Agregar Caja</button>
-            <button onClick={toggleDeleteButtons} className="delete-box-button">
+          <button 
+            onClick={handleAddBoxClick} 
+            className="add-box-button"
+            disabled={!permisos.turnero.add_boxes}  // Deshabilitar si no tiene permiso
+          >
+            Agregar Caja
+          </button>
+          <button 
+              onClick={toggleDeleteButtons} 
+              className="delete-box-button"
+              disabled={!permisos.turnero.del_boxes}  // Deshabilitar si no tiene permiso
+            >
               {showDeleteButtons ? 'Cancelar Eliminar' : 'Eliminar Caja'}
             </button>
           </div>
+          ) : (
+            <p>No se encontraron perimsos para modificar las cajas</p>
+        )}
         </header>
 
         {showAddBoxForm && (
@@ -170,17 +215,23 @@ const CajaEmpleados = () => {
           {cajas.map((caja) => (
             <div key={caja.id} className="caja-item">
               <h2>{caja.nombre_box}</h2>
-              <select
-                value={selectedBoxes[caja.id] || ''}
-                onChange={(e) => handleBoxChange(caja.id, e.target.value)}
-              >
-                <option value="">Seleccionar empleado</option>
-                {usuarios.map((usuario) => (
-                  <option key={usuario.LEGAJO} value={usuario.LEGAJO}>
-                    {usuario.NOMBRECOMPLETO}
-                  </option>
-                ))}
-              </select>
+            
+              {permisos.turnero && permisos.turnero.admin_usuarios_x_box ? (
+                    <select
+                      value={selectedBoxes[caja.id] || ''}
+                      onChange={(e) => handleBoxChange(caja.id, e.target.value)}
+                    >
+                      <option value="">Seleccionar empleado</option>
+                      {usuarios.map((usuario) => (
+                        <option key={usuario.LEGAJO} value={usuario.LEGAJO}>
+                          {usuario.NOMBRECOMPLETO}
+                        </option>
+                      ))}
+                    </select>
+
+                    ) : (
+                      <p>No se encontraron perimsos para seleccionar usuarios</p>
+                    )}
               {showDeleteButtons && (
                 <button className="delete-box-button" onClick={() => handleDeleteBox(caja.id)}>Eliminar</button>
               )}
