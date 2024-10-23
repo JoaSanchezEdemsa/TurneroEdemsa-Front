@@ -10,7 +10,7 @@ const CajaEmpleados = () => {
   const [selectedBoxes, setSelectedBoxes] = useState({});
   const [newBoxName, setNewBoxName] = useState('');
   const [showAddBoxForm, setShowAddBoxForm] = useState(false);
-  const [showDeleteButtons, setShowDeleteButtons] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
   
   const navigate = useNavigate();
 
@@ -38,7 +38,7 @@ const CajaEmpleados = () => {
 
       if (response.data) {
         setPermisos(response.data.result);
-        console.log(response.data.result)
+        console.log(response.data.result);
       } else {
         console.error('No se encontraron permisos con ese nick');
         setPermisos(null);
@@ -47,8 +47,6 @@ const CajaEmpleados = () => {
       console.error('Error al obtener permisos:', error);
     }
   };
-
-  
 
   useEffect(() => {
     const fetchCajas = async () => {
@@ -126,46 +124,70 @@ const CajaEmpleados = () => {
   };
 
   const handleAddBoxSubmit = async () => {
+    // Validar que el nombre de la caja no esté vacío
+    if (!newBoxName.trim()) {
+      console.error('El nombre de la caja es requerido.');
+      alert('El nombre de la caja es requerido.'); // Muestra un mensaje de alerta
+      return; // No continuar con el envío si el nombre está vacío
+    }
+  
+    // Verificar si el nombre de la caja ya existe
+    const boxExists = cajas.some((box) => box.nombre_box.toLowerCase() === newBoxName.trim().toLowerCase());
+    
+    if (boxExists) {
+      console.error('Nombre del box repetido.');
+      alert('Nombre del box repetido'); // Mostrar alerta si el nombre ya existe
+      return; // No continuar si el nombre ya existe
+    }
+  
     try {
       const sucursal = localStorage.getItem('sucursal');
       const created_by = localStorage.getItem('me');
-
-      const response = await axios.post('http://localhost:8080/addbox', { 
+  
+      console.log('Enviando solicitud para crear caja...');
+      
+      // Enviar solicitud al servidor para crear la caja
+      const response = await axios.post('http://localhost:8080/addBox', { 
         nombre_box: newBoxName,
         COD_UNICOM: sucursal,
-        created_by
+        created_by: created_by
       });
-      console.log('Respuesta de agregar caja:', response.data); 
-
-      if (response.data && response.data.success) {
-        setCajas([...cajas, response.data.newBox]); 
+  
+      console.log('Respuesta de la solicitud:', response.data);
+  
+      // Verifica que la respuesta contenga `success: true` y un `result`
+      if (response.data && response.data.success && response.data.result) {
+        const newBoxId = response.data.result;
+  
+        console.log('Caja creada con éxito, ID:', newBoxId);
+  
+        // Muestra el mensaje de éxito
+        setSuccessMessage('Caja creada exitosamente');
+        
+        // Resetea el nombre de la caja
         setNewBoxName('');
+        
+        // Oculta el formulario
         setShowAddBoxForm(false);
+  
+        // Mostrar el mensaje por 3 segundos antes de ocultarlo y luego recargar la página
+        setTimeout(() => {
+          setSuccessMessage(''); // Oculta el mensaje manualmente después de 3 segundos
+          window.location.reload(); // Recargar la página
+        }, 3000); // 3 segundos
       } else {
-        console.error('Error al agregar la caja.');
+        console.error('Error al agregar la caja: la respuesta no es válida o falta información.');
+        alert('Error: No se pudo crear la caja.');
       }
     } catch (error) {
       console.error('Error al agregar la caja:', error);
+      alert('Error: Ocurrió un problema al intentar agregar la caja.');
     }
   };
-
-  const handleDeleteBox = async (id) => {
-    try {
-      const response = await axios.delete(`http://localhost:8080/deletebox/${id}`); 
-      if (response.data && response.data.success) {
-        setCajas(cajas.filter(caja => caja.id !== id));
-      } else {
-        console.error('Error al eliminar la caja.');
-      }
-    } catch (error) {
-      console.error('Error al eliminar la caja:', error);
-    }
-  };
-
-  const toggleDeleteButtons = () => {
-    setShowDeleteButtons(!showDeleteButtons);
-  };
-
+  
+  
+  
+  
   return (
     <div className="cajas-page">
       <aside className="sidebar">
@@ -176,27 +198,20 @@ const CajaEmpleados = () => {
 
       <main className="content">
         <header className="header">
-          <h1>Cajas</h1>
+          <h1>Boxes</h1>
           {permisos.turnero ? (
-          <div className="button-container">
-          <button 
-            onClick={handleAddBoxClick} 
-            className="add-box-button"
-            disabled={!permisos.turnero.add_boxes}  
-          >
-            Agregar Caja
-          </button>
-          <button 
-              onClick={toggleDeleteButtons} 
-              className="delete-box-button"
-              disabled={!permisos.turnero.del_boxes} 
-            >
-              {showDeleteButtons ? 'Cancelar Eliminar' : 'Eliminar Caja'}
-            </button>
-          </div>
+            <div className="button-container">
+              <button 
+                onClick={handleAddBoxClick} 
+                className="add-box-button"
+                disabled={!permisos.turnero.add_boxes}  
+              >
+                Agregar Caja
+              </button>
+            </div>
           ) : (
-            <p>No se encontraron perimsos para modificar las cajas</p>
-        )}
+            <p>No se encontraron permisos para modificar las cajas</p>
+          )}
         </header>
 
         {showAddBoxForm && (
@@ -212,32 +227,34 @@ const CajaEmpleados = () => {
           </div>
         )}
 
-        <div className="box">
-          {cajas.map((caja) => (
-            <div key={caja.id} className="caja-item">
-              <h2>{caja.nombre_box}</h2>
-            
-              {permisos.turnero && permisos.turnero.admin_usuarios_x_box ? (
-                    <select
-                      value={selectedBoxes[caja.id] || ''}
-                      onChange={(e) => handleBoxChange(caja.id, e.target.value)}
-                    >
-                      <option value="">Seleccionar empleado</option>
-                      {usuarios.map((usuario) => (
-                        <option key={usuario.LEGAJO} value={usuario.LEGAJO}>
-                          {usuario.NOMBRECOMPLETO}
-                        </option>
-                      ))}
-                    </select>
+        {successMessage && <div className="success-message">{successMessage}</div>} {/* Muestra el mensaje de éxito */}
 
-                    ) : (
-                      <p>No se encontraron perimsos para seleccionar usuarios</p>
-                    )}
-              {showDeleteButtons && (
-                <button className="delete-box-button" onClick={() => handleDeleteBox(caja.id)}>Eliminar</button>
-              )}
-            </div>
-          ))}
+        <div className="box">
+          {cajas.length > 0 ? (
+            cajas.map((caja) => (
+              <div key={caja.id} className="caja-item">
+                <h2>{caja.nombre_box}</h2>
+                
+                {permisos.turnero && permisos.turnero.admin_usuarios_x_box ? (
+                  <select
+                    value={selectedBoxes[caja.id] || ''}
+                    onChange={(e) => handleBoxChange(caja.id, e.target.value)}
+                  >
+                    <option value="">Seleccionar empleado</option>
+                    {usuarios.map((usuario) => (
+                      <option key={usuario.LEGAJO} value={usuario.LEGAJO}>
+                        {usuario.NOMBRECOMPLETO}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p>No se encontraron permisos para seleccionar usuarios</p>
+                )}
+              </div>
+            ))
+          ) : (
+            <p>No hay cajas disponibles.</p>
+          )}
         </div>
       </main>
     </div>
