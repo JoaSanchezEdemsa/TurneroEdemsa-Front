@@ -3,7 +3,6 @@ import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaSyncAlt } from 'react-icons/fa';
-import Swal from 'sweetalert2';
 
 const Dashboard = () => {
   const navigate = useNavigate();
