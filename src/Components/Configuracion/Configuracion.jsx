@@ -7,12 +7,15 @@ const Configuracion = () => {
   const navigate = useNavigate();
   const [permisos, setPermisos] = useState(null);
   const [usuarios, setUsuarios] = useState([]);
+  const [motivos, setMotivos]= useState([]);
   const [sucursales, setSucursales] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedUserPermissions, setSelectedUserPermissions] = useState(null);
   const [selectedUserNick, setSelectedUserNick] = useState(null);
   const [selectedSucursal, setSelectedSucursal] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [showInput, setShowInput] = useState(false);
 
   useEffect(() => {
     if (!(localStorage.getItem('me') > 0)) {
@@ -76,6 +79,31 @@ const Configuracion = () => {
       setUsuarios([]);
     }
   };
+  const fetchMotivos = async () => {
+    try {
+      const sucursal = localStorage.getItem('sucursal');
+      if (!sucursal) {
+        console.error('No se encontró la sucursal en el localStorage');
+        return;
+      }
+
+      const response = await axios.get('http://localhost:8080/getmotivos', {
+        params: { COD_UNICOM: sucursal },
+      });
+
+      if (response.data && Array.isArray(response.data.result)) {
+        setMotivos(response.data.result);
+        setShowModal(true);
+        console.log(motivos)
+      } else {
+        console.error('No se encontraron usuarios o el formato es incorrecto');
+        setMotivos([]);
+      }
+    } catch (error) {
+      console.error('Error fetching usuarios:', error);
+      setMotivos([]);
+    }
+  };
 
   const fetchSucursales = async () => {
     try {
@@ -127,6 +155,26 @@ const Configuracion = () => {
     const selectedUsuario = usuarios.find((usuario) => usuario.LEGAJO === selectedLegajo);
     setSelectedUser(selectedUsuario);
   };
+
+  const handleMotivosClick = () => {
+    fetchMotivos();
+  }
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  // Función para mostrar el input
+  const handleAgregarClick = () => {
+    setShowInput(true);
+  };
+
+  // Función para cancelar y ocultar el input
+  const handleCancelarClick = () => {
+    setShowInput(false);
+  };
+
+
 
   return (
     <div className="configuracion-page">
@@ -188,6 +236,55 @@ const Configuracion = () => {
             <p>Cargando permisos...</p>
           )}
         </div>
+
+        <div>
+
+          <h1>Motivos</h1>
+          <button className="modal-close-button" onClick={handleMotivosClick}>Ver Motivos</button>
+
+        </div>
+
+        {/* Mostrar el pop-up si showModal es true */}
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Motivos</h2>
+            <div className="modal-buttons">
+              <button className="button agregar" onClick={handleAgregarClick}>
+                Agregar
+              </button>
+              <button className="button eliminar">
+                Eliminar
+              </button>
+            </div>
+
+            {showInput && (
+                <div className="nuevo-motivo">
+                  <input
+                    type="text"
+                    placeholder="Nombre del nuevo motivo"
+                    className="input-nuevo-motivo"
+                  />
+                  <button className="button agregar">Agregar</button>
+                  <button className="button cancelar" onClick={handleCancelarClick}>
+                    Cancelar
+                  </button>
+                </div>
+            )}
+
+            <ul>
+              {motivos.length > 0 ? (
+                motivos.map((motivo, index) => (
+                  <li key={index}>{motivo.motivo}</li> // Ajusta esto según la estructura de los motivos
+                ))
+              ) : (
+                <li>No hay motivos disponibles.</li>
+              )}
+            </ul>
+            <button className="modal-close-button" onClick={closeModal}>Cerrar</button>
+          </div>
+        </div>
+      )}
       </main>
 
       {isAdmin && (

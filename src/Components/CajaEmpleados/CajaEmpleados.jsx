@@ -11,6 +11,7 @@ const CajaEmpleados = () => {
   const [newBoxName, setNewBoxName] = useState('');
   const [showAddBoxForm, setShowAddBoxForm] = useState(false);
   const [showDeleteButtons, setShowDeleteButtons] = useState(false);
+  
   const navigate = useNavigate();
 
   useEffect(() => {
