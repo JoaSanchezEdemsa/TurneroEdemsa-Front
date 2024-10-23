@@ -129,15 +129,15 @@ const CajaEmpleados = () => {
       const sucursal = localStorage.getItem('sucursal');
       const created_by = localStorage.getItem('me');
 
-      const response = await axios.post('http://localhost:8080/addbox', { // Asegúrate de que la ruta sea correcta
+      const response = await axios.post('http://localhost:8080/addbox', { 
         nombre_box: newBoxName,
         COD_UNICOM: sucursal,
         created_by
       });
-      console.log('Respuesta de agregar caja:', response.data); // Agrega esto para inspeccionar la respuesta
+      console.log('Respuesta de agregar caja:', response.data); 
 
       if (response.data && response.data.success) {
-        setCajas([...cajas, response.data.newBox]); // Asegúrate de que la respuesta contenga la nueva caja
+        setCajas([...cajas, response.data.newBox]); 
         setNewBoxName('');
         setShowAddBoxForm(false);
       } else {
@@ -150,7 +150,7 @@ const CajaEmpleados = () => {
 
   const handleDeleteBox = async (id) => {
     try {
-      const response = await axios.delete(`http://localhost:8080/deletebox/${id}`); // Asegúrate de que la ruta sea correcta
+      const response = await axios.delete(`http://localhost:8080/deletebox/${id}`); 
       if (response.data && response.data.success) {
         setCajas(cajas.filter(caja => caja.id !== id));
       } else {
@@ -181,14 +181,14 @@ const CajaEmpleados = () => {
           <button 
             onClick={handleAddBoxClick} 
             className="add-box-button"
-            disabled={!permisos.turnero.add_boxes}  // Deshabilitar si no tiene permiso
+            disabled={!permisos.turnero.add_boxes}  
           >
             Agregar Caja
           </button>
           <button 
               onClick={toggleDeleteButtons} 
               className="delete-box-button"
-              disabled={!permisos.turnero.del_boxes}  // Deshabilitar si no tiene permiso
+              disabled={!permisos.turnero.del_boxes} 
             >
               {showDeleteButtons ? 'Cancelar Eliminar' : 'Eliminar Caja'}
             </button>

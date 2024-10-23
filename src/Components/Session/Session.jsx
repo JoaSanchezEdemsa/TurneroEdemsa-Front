@@ -11,9 +11,8 @@ const Session = () => {
   }
 
   useEffect(() => {
-    // Simulación de carga de datos (puedes reemplazar esto con una llamada a una API)
     setMe(localStorage.getItem("nick"));
-  }, []); // El array vacío asegura que esto solo se ejecute una vez al montar el componente
+  }, []); 
 
   return (
     <div>

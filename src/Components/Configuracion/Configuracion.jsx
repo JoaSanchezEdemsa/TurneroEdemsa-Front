@@ -112,8 +112,8 @@ const Configuracion = () => {
     if (selectedSucursal) {
       const sucursalSeleccionada = sucursales.find(s => s.NOM_UNICOM === selectedSucursal);
       if (sucursalSeleccionada) {
-        localStorage.setItem('sucursalNombre', sucursalSeleccionada.NOM_UNICOM);  // Guardar nombre
-        localStorage.setItem('sucursal', sucursalSeleccionada.COD_UNICOM);  // Guardar código
+        localStorage.setItem('sucursalNombre', sucursalSeleccionada.NOM_UNICOM); 
+        localStorage.setItem('sucursal', sucursalSeleccionada.COD_UNICOM); 
         console.log(`Sucursal cambiada a: ${sucursalSeleccionada.NOM_UNICOM} (${sucursalSeleccionada.COD_UNICOM})`);
         window.location.reload();
       }
@@ -147,7 +147,7 @@ const Configuracion = () => {
               <h3>Seleccionar Sucursal</h3>
               <select
                   value={selectedSucursal}
-                  onChange={(e) => setSelectedSucursal(e.target.value)}  // Ya estaba correcto
+                  onChange={(e) => setSelectedSucursal(e.target.value)}  
                 >
                   <option value="">Seleccionar una sucursal</option>
                   {sucursales.map((sucursal) => (

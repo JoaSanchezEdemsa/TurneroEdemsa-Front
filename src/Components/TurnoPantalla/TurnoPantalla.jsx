@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import { useNavigate } from 'react-router-dom'; 
 
 
 const TurnoForm = () => {
   const [sucursal, setSucursal] = useState('');
-  const navigate = useNavigate(); // Inicializa useNavigate
+  const navigate = useNavigate();
 
   const handleSucursalChange = (e) => {
     setSucursal(e.target.value);
   };
 
   const handleIniciarClick = () => {
-    navigate('/pantalla'); // Redirige a la página principal
+    navigate('/pantalla'); 
   };
 
   return (
@@ -32,7 +32,7 @@ const TurnoForm = () => {
         </select>
       </div>
       {sucursal && <p>Sucursal seleccionada: {sucursal}</p>}
-      <button onClick={handleIniciarClick}>Iniciar</button> {/* Botón "Iniciar" */}
+      <button onClick={handleIniciarClick}>Iniciar</button> 
     </div>
   );
 };

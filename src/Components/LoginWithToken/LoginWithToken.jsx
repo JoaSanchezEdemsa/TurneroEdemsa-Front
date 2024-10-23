@@ -8,13 +8,12 @@ const LoginWithToken = () => {
     const fetchData = async () => {
       try {
         const params = new URLSearchParams(window.location.search);
-        const token = params.get('token'); // Obtener el token de la URL
+        const token = params.get('token'); 
 
         if (!token) {
           throw new Error('No se encontró el token');
         }
 
-        // Hacer la solicitud con el token
         const response = await axios.get('http://turnero:8080/login', {
           params: { token }, 
           headers: {
@@ -22,35 +21,31 @@ const LoginWithToken = () => {
           },
         });
 
-        // Verificar si la respuesta fue exitosa y los datos son correctos
         if (!response.data.success || response.data.result === false) {
           throw new Error('No se encontraron datos para el token proporcionado');
         }
                 
-        localStorage.setItem('me', response.data.result.nick); // Almacenar en el localStorage
+        localStorage.setItem('me', response.data.result.nick); 
         localStorage.setItem('usuario', response.data.result.USUARIO);
 
-        // Verifica si el objeto 'response.data.result' tiene datos válidos
       if (response.data.result && response.data.result.usuarioOPEN) {
-          // Si el objeto tiene el atributo COD_UNICOM, lo almacenas en localStorage
           localStorage.setItem('sucursal', response.data.result.usuarioOPEN.COD_UNICOM);
           localStorage.setItem('sucursalNombre', response.data.result.usuarioOPEN.NOM_UNICOM);
 
         } else {
-              localStorage.setItem('sucursal', null); // Almacena un valor por defecto si no hay datos
+              localStorage.setItem('sucursal', null); 
         }
 
-
-        navigate('/dashboard'); // Navegar a la página de inicio
+        navigate('/dashboard');
 
       } catch (err) {
         return "error";
       }
     };
 
-    fetchData(); // Solo dispara una vez
+    fetchData(); 
 
-  }, []); // Vacío significa que se ejecuta solo una vez al montar
+  }, []); 
 
   return (""
   );
