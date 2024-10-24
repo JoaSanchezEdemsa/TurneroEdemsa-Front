@@ -5,12 +5,13 @@ import { useNavigate } from 'react-router-dom';
 
 const Configuracion = () => {
   const navigate = useNavigate();
-  const [permisos, setPermisos] = useState(null);
+  const [permisos, setPermisos] = useState({});
   const [usuarios, setUsuarios] = useState([]);
   const [motivos, setMotivos]= useState([]);
   const [sucursales, setSucursales] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [newMotivoName, setNewMotivoName] = useState('');
+  const [estimatedTime, setEstimatedTime] = useState(1);
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
   const [selectedUserPermissions, setSelectedUserPermissions] = useState(null);
   const [selectedUserNick, setSelectedUserNick] = useState(null);
@@ -44,7 +45,6 @@ const Configuracion = () => {
 
       if (response.data) {
         setPermisos(response.data.result);
-
         if (nick === '2000826') {
           setIsAdmin(true);
           fetchUsuarios();
@@ -200,7 +200,8 @@ const Configuracion = () => {
       const response = await axios.post('http://localhost:8080/addMotivo', { 
         motivo: newMotivoName,
         COD_UNICOM: sucursal,
-        created_by: created_by
+        created_by: created_by,
+        estimatedTime: estimatedTime 
       });
   
       console.log('Respuesta de la solicitud:', response.data);
@@ -292,24 +293,28 @@ const Configuracion = () => {
             <p>Cargando permisos...</p>
           )}
         </div>
+          {permisos.turnero && permisos.turnero.ver_motivosvisita ? (
+              <div>
+              <h1>Motivos</h1>
+              <button className="modal-close-button" onClick={handleMotivosClick}>Ver Motivos</button>
+              </div>
+            ) :(
+        
+              <p>No se encontraron permisos para ver Motivos</p>
 
-        <div>
-
-          <h1>Motivos</h1>
-          <button className="modal-close-button" onClick={handleMotivosClick}>Ver Motivos</button>
-
-        </div>
-
+            )}
         {/* Mostrar el pop-up si showModal es true */}
       {showModal && (
         <div className="modal">
           <div className="modal-content">
             <h2>Motivos</h2>
             <div className="modal-buttons">
-              <button className="button agregar" onClick={handleAgregarClick}>
+              <button className="button agregar" onClick={handleAgregarClick}
+              disabled={!permisos.turnero.add_motivosvisita}>
                 Agregar
               </button>
-              <button className="button eliminar">
+              <button className="button eliminar"
+              disabled={!permisos.turnero.del_motivosvisita}>
                 Eliminar
               </button>
             </div>
@@ -323,7 +328,22 @@ const Configuracion = () => {
                     placeholder="Nombre del nuevo motivo"
                     className="input-nuevo-motivo"
                   />
-                  <button className="button agregar" onClick={handleAddMotivoSubmit}>Agregar</button>
+                  <select className='input-nuevo-motivo'
+                    value={estimatedTime}
+                    onChange={(e) => setEstimatedTime(e.target.value)}
+                    required
+                    >
+                    <option value="">Seleccione el tiempo</option>
+                    {Array.from({ length: 60 }, (_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1} minuto{ i + 1 > 1 ? 's' : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <button className="button agregar" 
+                  onClick={handleAddMotivoSubmit}> 
+                    Agregar
+                  </button>
                   <button className="button cancelar" onClick={handleCancelarClick}>
                     Cancelar
                   </button>
