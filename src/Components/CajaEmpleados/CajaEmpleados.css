@@ -45,6 +45,59 @@
   box-shadow: none; /* Elimina cualquier sombra */
 }
 
+
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Permite desplazamiento horizontal si la tabla es más ancha que el contenedor */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse; /* Elimina los bordes duplicados entre celdas */
+}
+
+th, td {
+  padding: 15px 70px; /* Incrementa el padding para mayor separación */
+  text-align: left;
+  border-bottom: 1px solid #ddd; /* Añade una línea entre las filas */
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+td {
+  font-size: 14px;
+}
+
+/* Espaciado específico entre columnas */
+th:nth-child(1), td:nth-child(1) { /* Primera columna */
+  width: 25%; /* Ajusta el ancho de la columna de nombres de cajas */
+  font-size: 20px; /* Aumenta el tamaño de la fuente */
+  font-weight: bold; /* Aumenta el grosor del texto */
+
+}
+
+th:nth-child(2), td:nth-child(2) { /* Segunda columna (Operador) */
+  width: 40%; /* Ajusta el ancho de la columna de operadores */
+}
+
+th:nth-child(3), td:nth-child(3) { /* Tercera columna (Estado) */
+  width: 40%; /* Ajusta el ancho de la columna de estado */
+}
+
+th:nth-child(4), td:nth-child(4) { /* Cuarta columna (Eliminar) */
+  width: 20%; /* Ajusta el ancho de la columna del botón eliminar */
+}
+
+button {
+  padding: 10px 15px; /* Espacio dentro de los botones */
+  cursor: pointer;
+  border-radius: 5px;
+}
+
 .button-container {
   display: flex;
   gap: 10px; /* Espacio entre los botones */
@@ -53,6 +106,29 @@
   margin: 0; /* Sin margen */
   border: none; /* Sin borde */
   box-shadow: none; /* Sin sombra */
+}
+
+.delete-box-button {
+  background-color: #dc3545; /* Fondo rojo */
+  color: white; /* Color del ícono */
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  margin-left: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* Tamaño del botón */
+  height: 40px; /* Tamaño del botón */
+}
+
+.delete-box-button i {
+  font-size: 18px; /* Tamaño del ícono */
+}
+
+.delete-box-button:hover {
+  background-color: #c82333; /* Rojo más oscuro en hover */
 }
 
 .add-box-button,

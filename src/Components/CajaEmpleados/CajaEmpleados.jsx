@@ -2,16 +2,18 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './CajaEmpleados.css';
 import { useNavigate } from 'react-router-dom';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const CajaEmpleados = () => {
   const [permisos, setPermisos] = useState({});
   const [cajas, setCajas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [selectedBoxes, setSelectedBoxes] = useState({});
+  const [selectedStatus, setSelectedStatus] = useState({});
   const [newBoxName, setNewBoxName] = useState('');
   const [showAddBoxForm, setShowAddBoxForm] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
-  
+  const [successMessage, setSuccessMessage] = useState('');
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,7 +40,6 @@ const CajaEmpleados = () => {
 
       if (response.data) {
         setPermisos(response.data.result);
-        console.log(response.data.result);
       } else {
         console.error('No se encontraron permisos con ese nick');
         setPermisos(null);
@@ -104,10 +105,57 @@ const CajaEmpleados = () => {
     fetchUsuarios();
   }, []);
 
-  const handleBoxChange = (cajaId, empleadoId) => {
+  const handleBoxChange = async (cajaId, empleadoId) => {
+    // Actualizar el estado de selectedBoxes
+    const empleadoSeleccionado = usuarios.find(user => user.LEGAJO === empleadoId);
+    
     setSelectedBoxes((prevSelectedBoxes) => ({
       ...prevSelectedBoxes,
       [cajaId]: empleadoId,
+    }));
+  
+    if (empleadoSeleccionado) {
+      const nombreOperador = empleadoSeleccionado.NOMBRECOMPLETO; // Obtener el nombre completo del usuario
+  
+      try {
+        const sucursal = localStorage.getItem('sucursal');
+        
+        // Crear el objeto de datos que se enviará
+        const datosParaEnviar = {
+          id: cajaId,
+          COD_UNICOM: sucursal,
+          empleado: nombreOperador, 
+
+        };
+  
+        // Mostrar en la consola los datos que se van a enviar
+        console.log('Datos que se enviarán:', datosParaEnviar);
+  
+        // Enviar los datos a la base de datos
+        const response = await axios.post('http://localhost:8080/addOperador', datosParaEnviar);
+  
+        if (response.data && response.data.success) {
+          console.log('Operador asignado exitosamente');
+  
+          // Actualizar los usuarios disponibles, eliminando el que ya fue asignado
+          setUsuarios((prevUsuarios) => prevUsuarios.filter((user) => user.LEGAJO !== empleadoId));
+        } else {
+          console.error('Error al asignar el operador');
+        }
+      } catch (error) {
+        console.error('Error al asignar el operador:', error);
+      }
+    } else {
+      console.error('No se encontró el empleado seleccionado');
+    }
+  };
+  
+  
+
+  const handleStatusChange = (cajaId, status) => {
+    setSelectedStatus((prevSelectedStatus) => ({
+      ...prevSelectedStatus,
+      [cajaId]: status,
     }));
   };
 
@@ -124,70 +172,50 @@ const CajaEmpleados = () => {
   };
 
   const handleAddBoxSubmit = async () => {
-    // Validar que el nombre de la caja no esté vacío
     if (!newBoxName.trim()) {
-      console.error('El nombre de la caja es requerido.');
-      alert('El nombre de la caja es requerido.'); // Muestra un mensaje de alerta
-      return; // No continuar con el envío si el nombre está vacío
+      alert('El nombre de la caja es requerido.');
+      return;
     }
-  
-    // Verificar si el nombre de la caja ya existe
+
     const boxExists = cajas.some((box) => box.nombre_box.toLowerCase() === newBoxName.trim().toLowerCase());
-    
+
     if (boxExists) {
-      console.error('Nombre del box repetido.');
-      alert('Nombre del box repetido'); // Mostrar alerta si el nombre ya existe
-      return; // No continuar si el nombre ya existe
+      alert('Nombre del box repetido');
+      return;
     }
-  
+
     try {
       const sucursal = localStorage.getItem('sucursal');
       const created_by = localStorage.getItem('me');
-  
-      console.log('Enviando solicitud para crear caja...');
-      
-      // Enviar solicitud al servidor para crear la caja
-      const response = await axios.post('http://localhost:8080/addBox', { 
+
+      const response = await axios.post('http://localhost:8080/addBox', {
         nombre_box: newBoxName,
         COD_UNICOM: sucursal,
-        created_by: created_by
+        created_by: created_by,
       });
-  
-      console.log('Respuesta de la solicitud:', response.data);
-  
-      // Verifica que la respuesta contenga `success: true` y un `result`
-      if (response.data && response.data.success && response.data.result) {
-        const newBoxId = response.data.result;
-  
-        console.log('Caja creada con éxito, ID:', newBoxId);
-  
-        // Muestra el mensaje de éxito
+
+      if (response.data && response.data.success) {
         setSuccessMessage('Caja creada exitosamente');
-        
-        // Resetea el nombre de la caja
         setNewBoxName('');
-        
-        // Oculta el formulario
         setShowAddBoxForm(false);
-  
-        // Mostrar el mensaje por 3 segundos antes de ocultarlo y luego recargar la página
+
         setTimeout(() => {
-          setSuccessMessage(''); // Oculta el mensaje manualmente después de 3 segundos
-          window.location.reload(); // Recargar la página
-        }, 3000); // 3 segundos
+          setSuccessMessage('');
+          window.location.reload();
+        }, 3000);
       } else {
-        console.error('Error al agregar la caja: la respuesta no es válida o falta información.');
-        alert('Error: No se pudo crear la caja.');
+        console.error('Error al agregar la caja.');
       }
     } catch (error) {
       console.error('Error al agregar la caja:', error);
-      alert('Error: Ocurrió un problema al intentar agregar la caja.');
     }
   };
-  
-  
-  
-  
+
+  const handleDeleteBox = (boxId) => {
+    // Aquí agregarías la lógica para eliminar una caja
+    console.log('Eliminar caja con ID:', boxId);
+  };
+
   return (
     <div className="cajas-page">
       <aside className="sidebar">
@@ -227,34 +255,63 @@ const CajaEmpleados = () => {
           </div>
         )}
 
-        {successMessage && <div className="success-message">{successMessage}</div>} {/* Muestra el mensaje de éxito */}
+        {successMessage && <div className="success-message">{successMessage}</div>}
 
-        <div className="box">
-          {cajas.length > 0 ? (
-            cajas.map((caja) => (
-              <div key={caja.id} className="caja-item">
-                <h2>{caja.nombre_box}</h2>
-                
-                {permisos.turnero && permisos.turnero.admin_usuarios_x_box ? (
-                  <select
-                    value={selectedBoxes[caja.id] || ''}
-                    onChange={(e) => handleBoxChange(caja.id, e.target.value)}
-                  >
-                    <option value="">Seleccionar empleado</option>
-                    {usuarios.map((usuario) => (
-                      <option key={usuario.LEGAJO} value={usuario.LEGAJO}>
-                        {usuario.NOMBRECOMPLETO}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <p>No se encontraron permisos para seleccionar usuarios</p>
-                )}
-              </div>
-            ))
-          ) : (
-            <p>No hay cajas disponibles.</p>
-          )}
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre de caja</th>
+                <th>Operador</th>
+                <th>Estado</th>
+                <th>Eliminar</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cajas.length > 0 ? (
+                cajas.map((caja) => (
+                  <tr key={caja.id}>
+                    <td>{caja.nombre_box}</td>
+                    <td>
+                      {permisos.turnero && permisos.turnero.admin_usuarios_x_box ? (
+                        <select
+                          value={selectedBoxes[caja.id] || ''}
+                          onChange={(e) => handleBoxChange(caja.id, e.target.value)}
+                        >
+                          <option value="">Sin Operador</option>
+                          {usuarios.map((usuario) => (
+                            <option key={usuario.LEGAJO} value={usuario.LEGAJO}>
+                              {usuario.NOMBRECOMPLETO}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <p>No se encontraron permisos para seleccionar usuarios</p>
+                      )}
+                    </td>
+                    <td>
+                      <select
+                        value={selectedStatus[caja.id] || ''}
+                        onChange={(e) => handleStatusChange(caja.id, e.target.value)}
+                      >
+                        <option value="Habilitado">Habilitado</option>
+                        <option value="Deshabilitado">Deshabilitado</option>
+                      </select>
+                    </td>
+                    <td>
+                      <button className="delete-box-button" onClick={() => handleDeleteBox(caja.id)}>
+                        <i className="fas fa-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4">No hay cajas disponibles.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </main>
     </div>
