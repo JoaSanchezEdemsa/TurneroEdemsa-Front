@@ -106,7 +106,6 @@ const CajaEmpleados = () => {
   }, []);
 
   const handleBoxChange = async (cajaId, empleadoId) => {
-    // Actualizar el estado de selectedBoxes
     const empleadoSeleccionado = usuarios.find(user => user.LEGAJO === empleadoId);
     
     setSelectedBoxes((prevSelectedBoxes) => ({
@@ -115,30 +114,30 @@ const CajaEmpleados = () => {
     }));
   
     if (empleadoSeleccionado) {
-      const nombreOperador = empleadoSeleccionado.NOMBRECOMPLETO; // Obtener el nombre completo del usuario
+      const nombreOperador = empleadoSeleccionado.NOMBRECOMPLETO; 
   
       try {
         const sucursal = localStorage.getItem('sucursal');
-        
-        // Crear el objeto de datos que se enviará
         const datosParaEnviar = {
           id: cajaId,
           COD_UNICOM: sucursal,
           empleado: nombreOperador, 
-
         };
   
-        // Mostrar en la consola los datos que se van a enviar
         console.log('Datos que se enviarán:', datosParaEnviar);
-  
-        // Enviar los datos a la base de datos
         const response = await axios.post('http://localhost:8080/addOperador', datosParaEnviar);
   
         if (response.data && response.data.success) {
           console.log('Operador asignado exitosamente');
-  
-          // Actualizar los usuarios disponibles, eliminando el que ya fue asignado
+
           setUsuarios((prevUsuarios) => prevUsuarios.filter((user) => user.LEGAJO !== empleadoId));
+          setSuccessMessage('Operador de la caja actualizado exitosamente');
+  
+          // Limpiar el mensaje de éxito después de 3 segundos (opcional)
+          setTimeout(() => {
+            setSuccessMessage('');
+          }, 3000);
+
         } else {
           console.error('Error al asignar el operador');
         }
@@ -150,14 +149,48 @@ const CajaEmpleados = () => {
     }
   };
   
+  const handleStatusChange = async (cajaId, status) => {
+     // Actualizamos inmediatamente el estado local para reflejar el cambio en la UI
+  setSelectedStatus((prevSelectedStatus) => ({
+    ...prevSelectedStatus,
+    [cajaId]: status, // Guardamos el nuevo estado seleccionado
+  }));
+    try {
   
-
-  const handleStatusChange = (cajaId, status) => {
-    setSelectedStatus((prevSelectedStatus) => ({
-      ...prevSelectedStatus,
-      [cajaId]: status,
-    }));
+      // Crear el objeto de datos que se enviará al servidor
+      const datosParaEnviar = {
+        id: cajaId,
+        enable: status, // "Habilitado" o "Deshabilitado"
+      };
+  
+      console.log('Datos que se enviarán para el cambio de estado:', datosParaEnviar);
+  
+      // Enviar el estado actualizado de la caja al servidor
+      const response = await axios.post('http://localhost:8080/addEstado', datosParaEnviar);
+  
+      if (response.data && response.data.success) {
+        console.log('Estado de la caja actualizado exitosamente');
+  
+        // Actualizar el estado local de las cajas para reflejar el nuevo estado (opcional)
+        setSelectedStatus((prevSelectedStatus) => ({
+          ...prevSelectedStatus,
+          [cajaId]: status,
+        }));
+  
+        setSuccessMessage('Estado de la caja actualizado exitosamente');
+  
+        // Limpiar el mensaje de éxito después de 3 segundos (opcional)
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } else {
+        console.error('Error al actualizar el estado de la caja');
+      }
+    } catch (error) {
+      console.error('Error al actualizar el estado de la caja:', error);
+    }
   };
+  
 
   const handleTurnoClick = () => {
     navigate('/dashboard');
@@ -211,10 +244,42 @@ const CajaEmpleados = () => {
     }
   };
 
-  const handleDeleteBox = (boxId) => {
-    // Aquí agregarías la lógica para eliminar una caja
-    console.log('Eliminar caja con ID:', boxId);
+  const handleDeleteBox = async (boxId) => {
+    try {
+      const deleted_by = localStorage.getItem('me'); // Obtener el usuario que está eliminando la caja
+  
+      // Crear el objeto de datos que se enviará al servidor
+      const datosParaEnviar = {
+        id: boxId,
+        deleted_by: deleted_by, // Incluir información sobre quién eliminó la caja
+      };
+      console.log('Datos que se enviarán:', datosParaEnviar);
+
+  
+      // Enviar el ID de la caja eliminada al servidor
+      const response = await axios.delete('http://localhost:8080/deleteBox', datosParaEnviar);
+  
+      if (response.data && response.data.success) {
+        console.log('Caja eliminada exitosamente');
+  
+        // Mostrar un mensaje de éxito (opcional)
+        setSuccessMessage('Caja eliminada exitosamente');
+  
+        // Actualizar el estado de las cajas, eliminando la caja eliminada de la lista local
+        setCajas(prevCajas => prevCajas.filter(caja => caja.id !== boxId));
+  
+        // Limpiar el mensaje de éxito después de 3 segundos (opcional)
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+      } else {
+        console.error('Error al eliminar la caja');
+      }
+    } catch (error) {
+      console.error('Error al eliminar la caja:', error);
+    }
   };
+  
 
   return (
     <div className="cajas-page">
@@ -232,7 +297,6 @@ const CajaEmpleados = () => {
               <button 
                 onClick={handleAddBoxClick} 
                 className="add-box-button"
-                disabled={!permisos.turnero.add_boxes}  
               >
                 Agregar Caja
               </button>
@@ -243,15 +307,20 @@ const CajaEmpleados = () => {
         </header>
 
         {showAddBoxForm && (
-          <div className="add-box-form">
-            <input
-              type="text"
-              value={newBoxName}
-              onChange={(e) => setNewBoxName(e.target.value)}
-              placeholder="Nombre de la nueva caja"
-            />
-            <button className="agregar" onClick={handleAddBoxSubmit}>Agregar</button>
-            <button className="cancelar" onClick={() => setShowAddBoxForm(false)}>Cancelar</button>
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2>Agregar Nueva Caja</h2>
+              <input
+                type="text"
+                value={newBoxName}
+                onChange={(e) => setNewBoxName(e.target.value)}
+                placeholder="Nombre de la nueva caja"
+              />
+              <div className="modal-buttons">
+                <button className="agregar" onClick={handleAddBoxSubmit}>Agregar</button>
+                <button className="cancelar" onClick={() => setShowAddBoxForm(false)}>Cancelar</button>
+              </div>
+            </div>
           </div>
         )}
 

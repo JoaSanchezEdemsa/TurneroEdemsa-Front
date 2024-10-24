@@ -281,3 +281,79 @@ button {
   opacity: 0; /* Se desvanece la visibilidad */
   transform: translateX(-50%) translateY(-20px); /* Se desplaza ligeramente hacia arriba */
 }
+
+/* Overlay oscuro cuando el modal está activo */
+.modal-overlay {
+  position: fixed; /* Se fija en la pantalla */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999; /* Asegura que esté encima de todo */
+}
+
+/* Contenedor del modal */
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  z-index: 1000; /* Asegura que esté encima del overlay */
+  width: 300px;
+  text-align: center;
+}
+
+.modal-content h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.modal-buttons .agregar {
+  background-color: green;
+  color: white;
+}
+
+.modal-buttons .cancelar {
+  background-color: red;
+  color: white;
+}
+
+/* Animación de aparición */
+.modal-overlay.show {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
