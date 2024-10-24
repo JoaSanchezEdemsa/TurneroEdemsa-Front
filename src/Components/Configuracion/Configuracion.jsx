@@ -10,6 +10,8 @@ const Configuracion = () => {
   const [motivos, setMotivos]= useState([]);
   const [sucursales, setSucursales] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [newMotivoName, setNewMotivoName] = useState('');
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
   const [selectedUserPermissions, setSelectedUserPermissions] = useState(null);
   const [selectedUserNick, setSelectedUserNick] = useState(null);
   const [selectedSucursal, setSelectedSucursal] = useState('');
@@ -174,7 +176,61 @@ const Configuracion = () => {
     setShowInput(false);
   };
 
+  const handleAddMotivoSubmit = async () => {
+    if (!newMotivoName.trim()) {
+      console.error('El nombre del motivo es requerido.');
+      alert('El nombre del motivo es requerido.'); 
+      return; 
+    }
+  
+    const motivoExist = motivos.some((motiv) => motiv.motivo.toLowerCase() === newMotivoName.trim().toLowerCase());
+    
+    if (motivoExist) {
+      console.error('Nombre del box repetido.');
+      alert('Nombre del box repetido'); 
+      return; 
+    }
+  
+    try {
+      const sucursal = localStorage.getItem('sucursal');
+      const created_by = localStorage.getItem('me');
+  
+      console.log('Enviando solicitud para crear motivo...');
 
+      const response = await axios.post('http://localhost:8080/addMotivo', { 
+        motivo: newMotivoName,
+        COD_UNICOM: sucursal,
+        created_by: created_by
+      });
+  
+      console.log('Respuesta de la solicitud:', response.data);
+  
+
+      if (response.data && response.data.success && response.data.result) {
+        const newMotivoId = response.data.result;
+  
+        console.log('Motivo creado con exito, ID:', newMotivoId);
+  
+
+        setSuccessMessage('Motivo creado exitosamente');
+        
+        setNewMotivoName('');
+        
+        setShowInput(false);
+  
+        setTimeout(() => {
+          setSuccessMessage(''); 
+          window.location.reload(); 
+        }, 3000); 
+      } else {
+        console.error('Error al agregar el motivo: la respuesta no es válida o falta información.');
+        alert('Error: No se pudo crear el motivo.');
+      }
+    } catch (error) {
+      console.error('Error al agregar el motivo:', error);
+      alert('Error: Ocurrió un problema al intentar agregar el motivo.');
+    }
+  };
 
   return (
     <div className="configuracion-page">
@@ -262,16 +318,18 @@ const Configuracion = () => {
                 <div className="nuevo-motivo">
                   <input
                     type="text"
+                    value={newMotivoName}
+                    onChange={(e) => setNewMotivoName(e.target.value)}
                     placeholder="Nombre del nuevo motivo"
                     className="input-nuevo-motivo"
                   />
-                  <button className="button agregar">Agregar</button>
+                  <button className="button agregar" onClick={handleAddMotivoSubmit}>Agregar</button>
                   <button className="button cancelar" onClick={handleCancelarClick}>
                     Cancelar
                   </button>
                 </div>
             )}
-
+            {successMessage && <div className="success-message">{successMessage}</div>} {/* Muestra el mensaje de éxito */}
             <ul>
               {motivos.length > 0 ? (
                 motivos.map((motivo, index) => (
